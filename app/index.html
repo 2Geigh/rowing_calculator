@@ -6,6 +6,31 @@
     <title>ErgCalc</title>
 </head>
 <body>
+    <header>
+        <h1>ErgCalc</h1>
+    </header>
+
+    <main>
+        <form id="input">
+            <div class="piece-distance-input">
+                <label for="piece_distance">Distance of piece (m): </label><input name="piece_distance" type="number" placeholder="2000"></input>
+            </div>
+            <div class="number-of-divisions-input">
+                <label for="number_of_divisions">Number of piece divisions: </label><input name="number_of_divisions" type="number" placeholder="4"></input>
+            </div>
+            <div class="goal-time-input">
+                <label for="goal_time">Goal time: </label><input name="goal_time_hours" type="number" placeholder="Hour"></input>:<input name="goal_time_minutes" type="number" placeholder="Minutes"></input>:<input name="goal_time_seconds" type="number" placeholder="Seconds"></input>
+            </div>
+            <input type="submit" value="Compute">
+        </form>
+
+        <article id="output">
+            <span id="final-time">Goal final time:</span>
+            <span id="final-average-split">Goal average split:</span>
+            <span id="final-divisional-split">Final split per division:</span>
+        </article>
+    </main>
+
     <script src="./assets/js/main.js"></script>
 </body>
 </html>
