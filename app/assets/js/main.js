@@ -10,3 +10,14 @@ console.log('Hi mom');
 
 // Function for computing the outputs
 
+const App = () => {
+    return (
+        <>
+            <InputPanel/>
+            <OutputPanel/>
+        </>
+    );
+};
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
