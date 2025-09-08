@@ -14,30 +14,23 @@ const InputField = (props) => {
     );
 }
 
-const InputPanel = () => {
+const InputPanel = ( { dataToCompute, setDataToCompute } ) => {
 
-    const [formData, setFormData] = React.useState({
-        piece_distance: "",
-        number_of_divisions: "",
-        goal_time_hours: "",
-        goal_time_minutes: "",
-        goal_time_seconds: "",
-    });
-
-    // e is the event
     const handleChange = (e) => {
-        // ...formData is creating a new object with all the elements of formData, because React states are immutable
-        // We're copying the original state with ...formData so that when one field's value changes, the rest of the state remains in tact
-        setFormData(
+        // e is the event
+        // ...dataToCompute is creating a new object with all the elements of dataToCompute, because React states are immutable
+        // We're copying the original state with ...dataToCompute so that when one field's value changes, the rest of the state remains in tact
+        setDataToCompute(
             // e.target is the element that fired the event (the <input>)
             // [] tells JS to use the value inside it as the name of the key that we're overwriting (in this case, use e.target.name as the name of the key)
-            {...formData, [e.target.name]: e.target.value}
+            {...dataToCompute, [e.target.name]: e.target.value}
         );
     };
 
-
     const handleSubmit = (event) => {
         event.preventDefault(); // stops page reload
+
+        console.log(dataToCompute.piece_distance);
 
         console.log("Submitted successfully.");
     };
@@ -52,7 +45,7 @@ const InputPanel = () => {
                 name="piece_distance"
                 type="number"
                 placeholder={2000}
-                value={formData.piece_distance}
+                value={dataToCompute.piece_distance}
                 onChange={handleChange}
             />
 
@@ -62,6 +55,7 @@ const InputPanel = () => {
                 name="number_of_divisions"
                 type="number"
                 placeholder={4}
+                onChange={handleChange}
             />
 
             <InputField
@@ -70,6 +64,7 @@ const InputPanel = () => {
                 name="goal_hours"
                 type="number"
                 placeholder={0}
+                onChange={handleChange}
             />
 
             <InputField
@@ -78,6 +73,7 @@ const InputPanel = () => {
                 name="goal_minutes"
                 type="number"
                 placeholder={6}
+                onChange={handleChange}
             />
 
             <InputField
@@ -86,6 +82,7 @@ const InputPanel = () => {
                 name="goal_seconds"
                 type="number"
                 placeholder={34}
+                onChange={handleChange}
             />
 
             <input type="submit" defaultValue="Compute" />

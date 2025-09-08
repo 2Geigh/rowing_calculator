@@ -11,10 +11,19 @@ console.log('Hi mom');
 // Function for computing the outputs
 
 const App = () => {
+    
+    const [dataToCompute, setDataToCompute] = React.useState({
+        piece_distance: "",
+        number_of_divisions: "",
+        goal_time_hours: "",
+        goal_time_minutes: "",
+        goal_time_seconds: "",
+    });
+
     return (
         <>
-            <InputPanel/>
-            <OutputPanel/>
+            <InputPanel dataToCompute={dataToCompute} setDataToCompute={setDataToCompute}/>
+            <OutputPanel dataToCompute={dataToCompute}/>
         </>
     );
 };
