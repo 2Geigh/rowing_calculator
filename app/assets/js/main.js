@@ -15,15 +15,31 @@ const App = () => {
     const [dataToCompute, setDataToCompute] = React.useState({
         piece_distance: "",
         number_of_divisions: "",
-        goal_time_hours: "",
-        goal_time_minutes: "",
-        goal_time_seconds: "",
+        goal_hours: "",
+        goal_minutes: "",
+        goal_seconds: "",
+    });
+
+    const [computedData, setComputedData] = React.useState({
+        final_time: "",
+        final_time_display: "",
+        final_average_split: "",
+        final_average_split_display: "",
     });
 
     return (
         <>
-            <InputPanel dataToCompute={dataToCompute} setDataToCompute={setDataToCompute}/>
-            <OutputPanel dataToCompute={dataToCompute}/>
+            <InputPanel
+                dataToCompute={dataToCompute}
+                setDataToCompute={setDataToCompute}
+
+                computedData={computedData}
+                setComputedData={setComputedData}
+            />
+
+            <OutputPanel
+                computedData={computedData}
+            />
         </>
     );
 };
