@@ -33,9 +33,6 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
         // await setIsFormattedCorrectly(false)
 
         // Compute final time
-        let final_time = (parseFloat(dataToCompute.goal_hours) * 360) + (parseFloat(dataToCompute.goal_minutes) * 60) + (parseFloat(dataToCompute.goal_seconds));
-        let final_time_display;
-        let final_time_seconds = dataToCompute.goal_seconds;
         let final_time = (Math.abs(parseFloat(dataToCompute.goal_hours) * 3600)) + (Math.abs(parseFloat(dataToCompute.goal_minutes) * 60)) + (Math.abs(parseFloat(dataToCompute.goal_seconds)));
         let final_time_display = formatTime(final_time)[1];
 
@@ -58,14 +55,12 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                 }
         )
 
-        // for key in dataToCompute
-            // Set the value to a version with the leading zeroes trimmed
-
-            // To trim zeroes
-                // if value is a string type, splice
-                // If it's a number, convert to string, splice, then back to number
-                // Else nothing
-
+        // Clean input fields
+        let cleaned_dataToCompute = {} 
+        for (const key in dataToCompute) {
+            cleaned_dataToCompute[key] = trimLeadingZeroes(dataToCompute[key]);
+        }
+        setDataToCompute(cleaned_dataToCompute);
     };
 
     // SOLUTION
