@@ -27,8 +27,10 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
         );
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault(); // stops page reload
+    const handleSubmit = async (event) => {
+        await event.preventDefault(); // stops page reload
+        
+        // await setIsFormattedCorrectly(false)
 
         // Compute final time
         let final_time = (parseFloat(dataToCompute.goal_hours) * 360) + (parseFloat(dataToCompute.goal_minutes) * 60) + (parseFloat(dataToCompute.goal_seconds));
@@ -73,11 +75,10 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
             final_average_split_display = `0:${final_average_split_seconds}`;
         }
 
-        // Compute split 
-        console.log(final_average_split_display);
-
-        // Update state
-        setComputedData(
+        // await is redundant here because despite being asynchronous, React releases control of the code immediately after the setState call before its done
+        // And because state updaters don't return promises, we can't use .then() either
+        // Left as a learning lesson for the reader
+        await setComputedData(
             { ...computedData,
                     final_time: final_time,
                     final_time_display: final_time_display,
@@ -86,8 +87,19 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                 }
         )
 
-        setInterval(console.log(computedData), 5000);
+        // for key in dataToCompute
+            // Set the value to a version with the leading zeroes trimmed
+
+            // To trim zeroes
+                // if value is a string type, splice
+                // If it's a number, convert to string, splice, then back to number
+                // Else nothing
+
     };
+
+    // SOLUTION
+    // Runs *AFTER* computedData updates, as specified
+    React.useEffect(() => { console.log(computedData, dataToCompute) }, [computedData])
 
     return (
         <>
@@ -109,6 +121,7 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                 name="number_of_divisions"
                 type="number"
                 placeholder={4}
+                value={dataToCompute.number_of_divisions}
                 onChange={handleChange}
             />
 
@@ -118,6 +131,7 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                 name="goal_hours"
                 type="number"
                 placeholder={0}
+                value={dataToCompute.goal_hours}
                 onChange={handleChange}
             />
 
@@ -127,6 +141,7 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                 name="goal_minutes"
                 type="number"
                 placeholder={6}
+                value={dataToCompute.goal_minutes}
                 onChange={handleChange}
             />
 
@@ -136,6 +151,7 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                 name="goal_seconds"
                 type="number"
                 placeholder={34}
+                value={dataToCompute.goal_seconds}
                 onChange={handleChange}
             />
 
