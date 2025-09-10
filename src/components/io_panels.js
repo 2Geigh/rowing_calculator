@@ -33,14 +33,20 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
         // Compute final time
         let final_time = (parseFloat(dataToCompute.goal_hours) * 360) + (parseFloat(dataToCompute.goal_minutes) * 60) + (parseFloat(dataToCompute.goal_seconds));
         let final_time_display;
+        let final_time_seconds = dataToCompute.goal_seconds;
+
+        if (dataToCompute.goal_seconds === 0) {
+            final_time_seconds = "00";
+        }
+
         if (Math.floor(dataToCompute.goal_hours) > 0) {
-            final_time_display = `${dataToCompute.goal_hours}:${dataToCompute.goal_minutes}:${dataToCompute.goal_seconds}`;
+            final_time_display = `${dataToCompute.goal_hours}:${dataToCompute.goal_minutes}:${final_time_seconds}`;
         } 
         else if (Math.floor(dataToCompute.goal_minutes) > 0) {
-            final_time_display = `${dataToCompute.goal_minutes}:${dataToCompute.goal_seconds}`;
+            final_time_display = `${dataToCompute.goal_minutes}:${final_time_seconds}`;
         }
         else {
-            final_time_display = `${dataToCompute.goal_seconds}`;
+            final_time_display = `${final_time_seconds}`;
         }
 
         // Compute final average split
@@ -53,6 +59,10 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
         let final_average_split_minutes = Math.floor(final_average_split / 60);
         let final_average_split_seconds = final_average_split % 60;
 
+        if (final_average_split_seconds === 0) {
+            final_average_split_seconds = "00";
+        }
+
         if (Math.floor(final_average_split_hours > 0)) {
             final_average_split_display = `${final_average_split_hours}:${final_average_split_minutes}:${final_average_split_seconds}`;
         }
@@ -62,9 +72,6 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
         else {
             final_average_split_display = `0:${final_average_split_seconds}`;
         }
-
-        
-
 
         // Compute split 
         console.log(final_average_split_display);
