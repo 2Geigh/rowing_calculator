@@ -36,44 +36,15 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
         let final_time = (parseFloat(dataToCompute.goal_hours) * 360) + (parseFloat(dataToCompute.goal_minutes) * 60) + (parseFloat(dataToCompute.goal_seconds));
         let final_time_display;
         let final_time_seconds = dataToCompute.goal_seconds;
+        let final_time = (Math.abs(parseFloat(dataToCompute.goal_hours) * 3600)) + (Math.abs(parseFloat(dataToCompute.goal_minutes) * 60)) + (Math.abs(parseFloat(dataToCompute.goal_seconds)));
+        let final_time_display = formatTime(final_time)[1];
 
-        if (dataToCompute.goal_seconds === 0) {
-            final_time_seconds = "00";
+        let final_average_split = 0;
+        if (dataToCompute.piece_distance > 0) {
+            final_average_split = Math.abs((final_time / dataToCompute.piece_distance) * 500);
         }
 
-        if (Math.floor(dataToCompute.goal_hours) > 0) {
-            final_time_display = `${dataToCompute.goal_hours}:${dataToCompute.goal_minutes}:${final_time_seconds}`;
-        } 
-        else if (Math.floor(dataToCompute.goal_minutes) > 0) {
-            final_time_display = `${dataToCompute.goal_minutes}:${final_time_seconds}`;
-        }
-        else {
-            final_time_display = `${final_time_seconds}`;
-        }
-
-        // Compute final average split
-        // H:M:S (/ 500)
-
-        let final_average_split = (final_time / dataToCompute.piece_distance) * 500;
-        let final_average_split_display;
-
-        let final_average_split_hours = Math.floor((final_average_split / 60) / 60);
-        let final_average_split_minutes = Math.floor(final_average_split / 60);
-        let final_average_split_seconds = final_average_split % 60;
-
-        if (final_average_split_seconds === 0) {
-            final_average_split_seconds = "00";
-        }
-
-        if (Math.floor(final_average_split_hours > 0)) {
-            final_average_split_display = `${final_average_split_hours}:${final_average_split_minutes}:${final_average_split_seconds}`;
-        }
-        else if (Math.floor(final_average_split_minutes > 0)) {
-            final_average_split_display = `${final_average_split_minutes}:${final_average_split_seconds}`;
-        }
-        else {
-            final_average_split_display = `0:${final_average_split_seconds}`;
-        }
+        let final_average_split_display = formatTime(final_average_split)[1];
 
         // await is redundant here because despite being asynchronous, React releases control of the code immediately after the setState call before its done
         // And because state updaters don't return promises, we can't use .then() either
@@ -99,7 +70,8 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
 
     // SOLUTION
     // Runs *AFTER* computedData updates, as specified
-    React.useEffect(() => { console.log(computedData, dataToCompute) }, [computedData])
+    React.useEffect(() => { console.log(computedData);console.log(dataToCompute) }, [computedData])
+    // React.useEffect(() => { console.log(dataToCompute)}, [dataToCompute])
 
     return (
         <>
