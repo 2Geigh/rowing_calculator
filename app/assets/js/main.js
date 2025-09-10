@@ -27,6 +27,8 @@ const App = () => {
         final_average_split_display: "",
     });
 
+    const [hasInputsBeenSubmitted, setHasInputsBeenSubmitted] = React.useState(false);
+
     return (
         <>
             <InputPanel
@@ -35,10 +37,14 @@ const App = () => {
 
                 computedData={computedData}
                 setComputedData={setComputedData}
+
+                setHasInputsBeenSubmitted={setHasInputsBeenSubmitted}
             />
 
             <OutputPanel
                 computedData={computedData}
+
+                hasInputsBeenSubmitted={hasInputsBeenSubmitted}
             />
         </>
     );

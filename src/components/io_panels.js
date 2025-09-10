@@ -1,20 +1,28 @@
 const InputField = (props) => {
     return (
-        <div className={props.className}>
+        <div className={`${props.className} flex justify-between rounded items-center bg-gray-200 block m-3 p-2 w-100`}>
             <label htmlFor={props.name}>{props.labelText}</label>
 
             <input
+
+                className={`bg-white w-20 text-center rounded p-1`}
+
                 name={props.name}
                 type={props.type}
                 placeholder={props.placeholder}
                 value={props.value}
                 onChange={props.onChange}
+
+                style={{ 
+                    'MozAppearance': 'textfield', // For Firefox
+                    'appearance': 'none' // For other browsers
+                    }}
             />
         </div>
     );
 }
 
-const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setComputedData } ) => {
+const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setComputedData, setHasInputsBeenSubmitted } ) => {
 
     const handleChange = (e) => {
         // e is the event
@@ -34,6 +42,7 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
 
         // Compute final time
         let final_time = (Math.abs(parseFloat(dataToCompute.goal_hours) * 3600)) + (Math.abs(parseFloat(dataToCompute.goal_minutes) * 60)) + (Math.abs(parseFloat(dataToCompute.goal_seconds)));
+        isNaN(final_time) ? final_time = 0 : final_time;
         let final_time_display = formatTime(final_time)[1];
 
         let final_average_split = 0;
@@ -61,6 +70,8 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
             cleaned_dataToCompute[key] = trimLeadingZeroes(dataToCompute[key]);
         }
         setDataToCompute(cleaned_dataToCompute);
+
+        setHasInputsBeenSubmitted(true);
     };
 
     // SOLUTION
@@ -70,7 +81,11 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
 
     return (
         <>
-        <form id="input" onSubmit={handleSubmit}>
+        <form
+            id="input"
+            onSubmit={handleSubmit}
+            className="bg-gray-300 border-solid border-2 border-gray-400 p-2 max-w-lg flex flex-col items-center justify-center rounded"
+        >
 
             <InputField
                 labelText="Distance of piece (m): "
@@ -122,18 +137,27 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                 onChange={handleChange}
             />
 
-            <input type="submit" defaultValue="Compute" />
+            <input
+                type="submit"
+                defaultValue="Compute"
+                className={`bg-gray-50 w-100 mb-3 rounded`}
+            />
         </form>
         </>
     );
 };
 
-const OutputPanel = () => {
-    return (
-        <article id="output">
-            <span id="final-time">Goal final time:</span>
-            <span id="final-average-split">Goal average split:</span>
+const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
+
+    if (hasInputsBeenSubmitted) {
+        return (
+        <article
+            id="output"
+            className={`bg-gray-300 border-solid border-2 border-gray-400 p-2 max-w-lg flex flex-col items-center justify-center rounded`}>
+            <span id="final-time">Goal final time: {computedData.final_time_display}</span>
+            <span id="final-average-split">Goal average split: {computedData.final_average_split_display}</span>
             {/* <span id="final-divisional-split">Final split per division:</span> */}
         </article>
     );
+    }
 };
