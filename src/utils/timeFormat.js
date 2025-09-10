@@ -16,7 +16,7 @@ const formatTime = (total_time_in_seconds) => {
     [[1,0,1],'1:00:01']
     
     */
-
+    
     let hours = Math.floor(total_time_in_seconds / 3600); // Calculate hours
     let seconds = total_time_in_seconds % 3600; // Remaining seconds after extracting hours
     let minutes = Math.floor(seconds / 60); // Calculate minutes
@@ -26,10 +26,10 @@ const formatTime = (total_time_in_seconds) => {
     // Format the display string
     let time_display;
     let display_minutes = minutes;
-    let display_seconds = seconds;
+    let display_seconds = Math.floor(seconds);
 
     if (seconds < 10) {
-        display_seconds = `0${seconds}`;
+        display_seconds = `0${display_seconds}`;
     }
 
     time_display = `${display_minutes}:${display_seconds}`;
