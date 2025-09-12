@@ -52,6 +52,9 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
 
         let final_average_split_display = formatTime(final_average_split)[1];
 
+        let number_of_divisions = dataToCompute.number_of_divisions;
+        let total_distance = dataToCompute.piece_distance;
+
         // await is redundant here because despite being asynchronous, React releases control of the code immediately after the setState call before its done
         // And because state updaters don't return promises, we can't use .then() either
         // Left as a learning lesson for the reader
@@ -60,7 +63,9 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
                     final_time: final_time,
                     final_time_display: final_time_display,
                     final_average_split: final_average_split,
-                    final_average_split_display: final_average_split_display
+                    final_average_split_display: final_average_split_display,
+                    number_of_divisions: number_of_divisions,
+                    total_distance: total_distance,
                 }
         )
 
@@ -76,8 +81,7 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
 
     // SOLUTION
     // Runs *AFTER* computedData updates, as specified
-    React.useEffect(() => { console.log(computedData);console.log(dataToCompute) }, [computedData])
-    // React.useEffect(() => { console.log(dataToCompute)}, [dataToCompute])
+    // React.useEffect(() => { console.log(computedData);console.log(dataToCompute) }, [computedData])
 
     return (
         <>
@@ -149,6 +153,8 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
 
 const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
 
+    const [OutputGraphRender, setOutputGraphRender] = React.useState(0);
+
     if (hasInputsBeenSubmitted) {
         return (
         <article
@@ -156,6 +162,10 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
             className={`bg-gray-300 border-solid border-2 border-gray-400 p-2 max-w-lg flex flex-col items-center justify-center rounded`}>
             <span id="final-time">Goal final time: {computedData.final_time_display}</span>
             <span id="final-average-split">Goal average split: {computedData.final_average_split_display}</span>
+            <OutputGraphForSplitMode
+                OutputGraphRender={OutputGraphRender}
+                setOutputGraphRender={setOutputGraphRender}
+                computedData={computedData} />
             {/* <span id="final-divisional-split">Final split per division:</span> */}
         </article>
     );

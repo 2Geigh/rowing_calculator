@@ -25,6 +25,8 @@ const App = () => {
         final_time_display: "",
         final_average_split: "",
         final_average_split_display: "",
+        number_of_divisions: "",
+        total_distance: "",
     });
 
     const [hasInputsBeenSubmitted, setHasInputsBeenSubmitted] = React.useState(false);

@@ -10,6 +10,10 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
+    <!-- Rendering dependencies -->
+    <!-- <script async src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+    <script async src="https://d3js.org/d3.v7.min.js"></script>
+
     <link rel="stylesheet" href="./assets/css/app.css">
 
     <title>ErgCalc</title>
@@ -22,13 +26,14 @@
     <!-- Root where <App/> will be rendered -->
     <main class="flex w-full h-full bg-black-100 flex-row" id="root"></main>
 
-    
-
     <!-- Modules -->
     <script type="text/jsx" src="../src/utils/timeFormat.js"></script>
     <script type="text/jsx" src="../src/utils/validation.js"></script>
+    <script type="text/jsx" src="../src/components/output_graphs.js"></script>
     <script type="text/jsx" src="../src/components/io_panels.js"></script>
     <script type="text/jsx" src="./assets/js/main.js"></script>
+
+    
 
     <footer id="footer"></footer>
     <script>
