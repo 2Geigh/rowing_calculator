@@ -1,3 +1,8 @@
+import InputPanel from './components/InputPanel.jsx';
+import OutputPanel from './components/OutputPanel';
+import { useState } from 'react';
+import './App.css';
+
 console.log('Hi mom');
 
 // Get the inputs
@@ -12,7 +17,7 @@ console.log('Hi mom');
 
 const App = () => {
     
-    const [dataToCompute, setDataToCompute] = React.useState({
+    const [dataToCompute, setDataToCompute] = useState({
         piece_distance: "",
         number_of_divisions: "",
         goal_hours: "",
@@ -20,7 +25,7 @@ const App = () => {
         goal_seconds: "",
     });
 
-    const [computedData, setComputedData] = React.useState({
+    const [computedData, setComputedData] = useState({
         final_time: "",
         final_time_display: "",
         final_average_split: "",
@@ -29,7 +34,7 @@ const App = () => {
         total_distance: "",
     });
 
-    const [hasInputsBeenSubmitted, setHasInputsBeenSubmitted] = React.useState(false);
+    const [hasInputsBeenSubmitted, setHasInputsBeenSubmitted] = useState(false);
 
     return (
         <>
@@ -52,5 +57,4 @@ const App = () => {
     );
 };
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App/>);
+export default App;

@@ -1,26 +1,6 @@
-const InputField = (props) => {
-    return (
-        <div className={`${props.className} flex justify-between rounded items-center bg-gray-200 block m-3 p-2 w-100`}>
-            <label htmlFor={props.name}>{props.labelText}</label>
-
-            <input
-
-                className={`bg-white w-20 text-center rounded p-1`}
-
-                name={props.name}
-                type={props.type}
-                placeholder={props.placeholder}
-                value={props.value}
-                onChange={props.onChange}
-
-                style={{ 
-                    'MozAppearance': 'textfield', // For Firefox
-                    'appearance': 'none' // For other browsers
-                    }}
-            />
-        </div>
-    );
-}
+import InputField from './InputField';
+import formatTime from '../utils/timeFormat'
+import trimLeadingZeroes from '../utils/validation';
 
 const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setComputedData, setHasInputsBeenSubmitted } ) => {
 
@@ -151,23 +131,4 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
     );
 };
 
-const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
-
-    const [OutputGraphRender, setOutputGraphRender] = React.useState(0);
-
-    if (hasInputsBeenSubmitted) {
-        return (
-        <article
-            id="output"
-            className={`bg-gray-300 border-solid border-2 border-gray-400 p-2 max-w-lg flex flex-col items-center justify-center rounded`}>
-            <span id="final-time">Goal final time: {computedData.final_time_display}</span>
-            <span id="final-average-split">Goal average split: {computedData.final_average_split_display}</span>
-            <OutputGraphForSplitMode
-                OutputGraphRender={OutputGraphRender}
-                setOutputGraphRender={setOutputGraphRender}
-                computedData={computedData} />
-            {/* <span id="final-divisional-split">Final split per division:</span> */}
-        </article>
-    );
-    }
-};
+export default InputPanel;

@@ -45,3 +45,5 @@ const trimLeadingZeroes = (n) => {
     }
 
 };
+
+export default trimLeadingZeroes;

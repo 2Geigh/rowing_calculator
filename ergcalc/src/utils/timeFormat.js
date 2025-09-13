@@ -48,3 +48,5 @@ const formatTime = (total_time_in_seconds) => {
 
     return [[hours, minutes, seconds], time_display]
 }
+
+export default formatTime;
