@@ -12,6 +12,7 @@ const InputField = (props) => {
                 placeholder={props.placeholder}
                 value={props.value}
                 onChange={props.onChange}
+                id={props.name}
 
                 style={{ 
                     'MozAppearance': 'textfield', // For Firefox

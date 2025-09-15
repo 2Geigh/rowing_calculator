@@ -10,7 +10,7 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
 
     if (hasInputsBeenSubmitted) {
         return (
-        <article
+        <section
             id="output"
             className={`bg-gray-300 border-solid border-2 border-gray-400 p-2 max-w-lg flex flex-col items-center justify-center rounded`}>
             <span id="final-time">Goal final time: {computedData.final_time_display}</span>
@@ -23,7 +23,7 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
                 OutputGraphHeight={OutputGraphHeight}
                 />
             {/* <span id="final-divisional-split">Final split per division:</span> */}
-        </article>
+        </section>
     );
     }
 };
