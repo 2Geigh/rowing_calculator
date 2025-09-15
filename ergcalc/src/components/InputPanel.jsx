@@ -2,7 +2,7 @@ import InputField from './InputField';
 import formatTime from '../utils/timeFormat'
 import trimLeadingZeroes from '../utils/validation';
 
-const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setComputedData, setHasInputsBeenSubmitted } ) => {
+const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setComputedData, setHasInputsBeenSubmitted, slowestPermissibleSplit } ) => {
 
     const handleChange = (e) => {
         // e is the event
@@ -28,6 +28,13 @@ const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setCompute
         let final_average_split = 0;
         if (dataToCompute.piece_distance > 0) {
             final_average_split = Math.abs((final_time / dataToCompute.piece_distance) * 500);
+        }
+
+        let inputSplitTooSlow = final_average_split >= slowestPermissibleSplit;
+        
+        if (inputSplitTooSlow) {
+            window.alert("Goal split must be faster than 3:00 / 500m.")
+            return;
         }
 
         let final_average_split_display = formatTime(final_average_split)[1];

@@ -1,13 +1,11 @@
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { Bar, LinePath } from "@visx/shape";
 
-const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight}) => {
+const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight, slowestPermissibleSplit}) => {
     // console.log(computedData);
 
     const width = OutputGraphWidth;
     const height = OutputGraphHeight;
-
-    const slowest_permissable_split = 180; //s per 500m, equivalent to 3:00/500m
 
     // Compute XY coordinates for each point (one per division)
     let number_of_divisions = computedData.number_of_divisions;
@@ -29,7 +27,7 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         x_coordinates_absolute.push(x);
     };
 
-    console.log(`point_coordinates_absolute: ${point_coordinates_absolute}`);
+    // console.log(`point_coordinates_absolute: ${point_coordinates_absolute}`);
     // console.log(`x_coordinates_absolute: ${x_coordinates_absolute}`);
 
 
@@ -40,7 +38,7 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
     }); // xScale("A") returns the left-pixel coordinate for Bar A
 
     const yScale = scaleLinear({
-        domain: [0, slowest_permissable_split],
+        domain: [0, slowestPermissibleSplit],
         range: [height, 0], // because in an svg, the top is 0
         padding: 0.0,
     });
@@ -53,8 +51,8 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         let barY = yScale(y_coordinates_absolute[i]);
         barCoordinates[i] = {x: barX, y: barY};
     };
-    console.log(`barCoordinates:`);
-    console.log(barCoordinates)
+    // console.log(`barCoordinates:`);
+    // console.log(barCoordinates)
     // console.log(`width: ${OutputGraphWidth}`);
     // console.log(`barWidth: ${barWidth}`);
     // console.log(`bar_: ${barHeightZ}`)
@@ -68,10 +66,10 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
             {/* BARS */}
             {barCoordinates.map(p => {
                 const barHeight = p.y; // because in an svg, the top is 0
-                console.log(`barHeight: ${barHeight}`)
+                {/* console.log(`barHeight: ${barHeight}`) */}
                 const barX = p.x;
                 const barY = height - barHeight;
-                console.log(`barY: ${barY}`)
+                {/* console.log(`barY: ${barY}`) */}
             
                 return (
                     <Bar

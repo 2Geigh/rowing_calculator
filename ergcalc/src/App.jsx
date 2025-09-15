@@ -36,6 +36,8 @@ const App = () => {
 
     const [hasInputsBeenSubmitted, setHasInputsBeenSubmitted] = useState(false);
 
+    const slowestPermissibleSplit = 180; // 3:00 / 500m
+
     return (
         <>
             <InputPanel
@@ -46,12 +48,16 @@ const App = () => {
                 setComputedData={setComputedData}
 
                 setHasInputsBeenSubmitted={setHasInputsBeenSubmitted}
+
+                slowestPermissibleSplit={slowestPermissibleSplit}
             />
 
             <OutputPanel
                 computedData={computedData}
 
                 hasInputsBeenSubmitted={hasInputsBeenSubmitted}
+
+                slowestPermissibleSplit={slowestPermissibleSplit}
             />
         </>
     );
