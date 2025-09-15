@@ -6,6 +6,7 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
     const [OutputGraphRender, setOutputGraphRender] = useState(0);
 
     const [OutputGraphWidth, setOutputGraphWidth] = useState(400);
+    const [OutputGraphHeight, setOutputGraphheight] = useState(180);
 
     if (hasInputsBeenSubmitted) {
         return (
@@ -19,6 +20,7 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
                 setOutputGraphRender={setOutputGraphRender}
                 computedData={computedData}
                 OutputGraphWidth={OutputGraphWidth}
+                OutputGraphHeight={OutputGraphHeight}
                 />
             {/* <span id="final-divisional-split">Final split per division:</span> */}
         </article>

@@ -1,17 +1,19 @@
 import { scaleBand, scaleLinear } from "@visx/scale";
 import { Bar, LinePath } from "@visx/shape";
 
-const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, height = 200}) => {
+const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight}) => {
     // console.log(computedData);
 
     const width = OutputGraphWidth;
+    const height = OutputGraphHeight;
+
+    const slowest_permissable_split = 180; //s per 500m, equivalent to 3:00/500m
 
     // Compute XY coordinates for each point (one per division)
     let number_of_divisions = computedData.number_of_divisions;
     let total_distance = computedData.total_distance;
     let average_split = computedData.final_average_split;
 
-    let point_coordinates = {};
     let point_coordinates_absolute = [];
 
     let y_coordinates_absolute = [];
@@ -28,7 +30,7 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
     };
 
     console.log(`point_coordinates_absolute: ${point_coordinates_absolute}`);
-    console.log(`x_coordinates_absolute: ${x_coordinates_absolute}`);
+    // console.log(`x_coordinates_absolute: ${x_coordinates_absolute}`);
 
 
     const xScale = scaleLinear({
@@ -37,16 +39,25 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         padding: 0.0,                         // space between bars
     }); // xScale("A") returns the left-pixel coordinate for Bar A
 
+    const yScale = scaleLinear({
+        domain: [0, slowest_permissable_split],
+        range: [height, 0], // because in an svg, the top is 0
+        padding: 0.0,
+    });
+
     const barWidth = width / number_of_divisions;
     const barCoordinates = []
     // const barCoordinates = point_coordinates_absolute.map((x) => {x});
     for (let i = 0; i < number_of_divisions; i++) {
-        const barX = i * (width / number_of_divisions);
-        barCoordinates[i] = [barX, y_coordinates_absolute[i]];
+        let barX = i * (width / number_of_divisions);
+        let barY = yScale(y_coordinates_absolute[i]);
+        barCoordinates[i] = {x: barX, y: barY};
     };
-    console.log(`barCoordinates: ${barCoordinates}`);
-    console.log(`width: ${OutputGraphWidth}`);
-    console.log(`barWidth: ${barWidth}`);
+    console.log(`barCoordinates:`);
+    console.log(barCoordinates)
+    // console.log(`width: ${OutputGraphWidth}`);
+    // console.log(`barWidth: ${barWidth}`);
+    // console.log(`bar_: ${barHeightZ}`)
     
 
 
@@ -56,14 +67,15 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         <svg width={OutputGraphWidth} height={height} className="bg-red-100">
             {/* BARS */}
             {barCoordinates.map(p => {
-                const barHeight = height - p[1];
-                const barX = p[0];
-                const barY = p[1];
-            
+                const barHeight = p.y; // because in an svg, the top is 0
+                console.log(`barHeight: ${barHeight}`)
+                const barX = p.x;
+                const barY = height - barHeight;
+                console.log(`barY: ${barY}`)
             
                 return (
                     <Bar
-                        key={p[0]}
+                        key={p.x}
                         x={barX}
                         y={barY}
                         width={barWidth}
