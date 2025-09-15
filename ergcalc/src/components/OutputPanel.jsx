@@ -5,6 +5,8 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
 
     const [OutputGraphRender, setOutputGraphRender] = useState(0);
 
+    const [OutputGraphWidth, setOutputGraphWidth] = useState(400);
+
     if (hasInputsBeenSubmitted) {
         return (
         <article
@@ -15,7 +17,9 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted} ) => {
             <OutputGraphForSplitMode
                 OutputGraphRender={OutputGraphRender}
                 setOutputGraphRender={setOutputGraphRender}
-                computedData={computedData} />
+                computedData={computedData}
+                OutputGraphWidth={OutputGraphWidth}
+                />
             {/* <span id="final-divisional-split">Final split per division:</span> */}
         </article>
     );
