@@ -149,6 +149,17 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
                             stroke="#6B1400"
                             strokeWidth={2}
                         />
+
+                        {/* CIRCLES */}
+                        {pointCoordinates.map((p, i) => (
+                            <Circle
+                                key={`point_${i}`}
+                                cx={p.x}
+                                cy={p.y}
+                                r={4}
+                                fill="orange"
+                            />
+                        ))}
                     </Group>
                 </svg>
             </div>
