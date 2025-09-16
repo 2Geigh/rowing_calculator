@@ -5,9 +5,10 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted, slowestPermissibleS
 
     const [OutputGraphRender, setOutputGraphRender] = useState(0);
 
-    const [OutputGraphWidth, setOutputGraphWidth] = useState(300);
-    const [OutputGraphHeight, setOutputGraphheight] = useState(200);
-    const [OutputGraphMargin, setOutputGraphMargin] = useState({ top: 20, right: 20, bottom: 20, left: 20});
+    const [OutputGraphWidth, setOutputGraphWidth] = useState(500); // Default test value: 500;
+    const [OutputGraphHeight, setOutputGraphheight] = useState(200); // Default test value: 200;
+    const [OutputGraphMargin, setOutputGraphMargin] = useState({ top: 20, right: 20, bottom: 60, left: 65}); // Default test values: 20, 20, 60, 65
+                                                                    // TODO: Make these margin values relative to OutputGraphWidth and OutputGraphHeight rather than being hardcoded 
 
     if (hasInputsBeenSubmitted) {
         return (

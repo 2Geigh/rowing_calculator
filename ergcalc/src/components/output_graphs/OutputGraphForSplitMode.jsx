@@ -1,14 +1,13 @@
 import { scaleLinear } from "@visx/scale";
 import { Bar, LinePath } from "@visx/shape";
-import { AxisLeft } from '@visx/axis';
+import { Axis } from '@visx/axis';
 import { Group } from '@visx/group';
 
 const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight, slowestPermissibleSplit, OutputGraphMargin}) => {
-    // console.log(computedData);
 
-    const width = OutputGraphWidth;
-    const height = OutputGraphHeight;
     const margin = OutputGraphMargin;
+    const width = OutputGraphWidth / (1.5);
+    const height = OutputGraphHeight - margin.top;
 
     // Compute XY coordinates for each point (one per division)
     let number_of_divisions = computedData.number_of_divisions;
@@ -19,16 +18,21 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
 
     let y_coordinates_absolute = [];
     let x_coordinates_absolute = [];
+    let x_axis_domain = [];
 
-    for (let i=0; i < number_of_divisions; i++) {
-        let relative_x = (total_distance / number_of_divisions)
-        let x =  relative_x * (i);
+    for (let i=0; i <= number_of_divisions; i++) {
+        let x =  (total_distance / number_of_divisions) * (i);
         let y = average_split;
 
-        point_coordinates_absolute.push([x,y]);
-        y_coordinates_absolute.push(y);
-        x_coordinates_absolute.push(x);
+        x_axis_domain.push(x)
+
+        if (i < number_of_divisions) {
+            point_coordinates_absolute.push([x,y]);
+            y_coordinates_absolute.push(y);
+            x_coordinates_absolute.push(x);
+        }
     };
+    console.log(x_axis_domain)
 
     // console.log(`point_coordinates_absolute: ${point_coordinates_absolute}`);
     // console.log(`x_coordinates_absolute: ${x_coordinates_absolute}`);
@@ -36,7 +40,7 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
 
     const xScale = scaleLinear({
         domain: [0, Math.max(...x_coordinates_absolute)], // the categorical labels
-        range: [0, width],                            // pixel span horizontally
+        range: [0, (width)],                            // pixel span horizontally
         padding: 0.0,                         // space between bars
     }); // xScale("A") returns the left-pixel coordinate for Bar A
 
@@ -52,11 +56,17 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         padding: 0.0,
     });
 
-    const barWidth = width / number_of_divisions;
+    const xAxisScale = scaleLinear({
+        domain: [0, Math.max(...x_axis_domain)],
+        range: [0, width],
+        padding: 0.0,
+    });
+
+    const barWidth = (width) / number_of_divisions;
     const barCoordinates = []
     // const barCoordinates = point_coordinates_absolute.map((x) => {x});
     for (let i = 0; i < number_of_divisions; i++) {
-        let barX = i * (width / number_of_divisions);
+        let barX = i * ((width) / number_of_divisions);
         let barY = yScale(y_coordinates_absolute[i]);
         barCoordinates[i] = {x: barX, y: barY};
     };
@@ -77,22 +87,42 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         </div>
 
         <div id="graphAndXAxisLabel" className="block center bg-pink-300"> */}
-            <svg width={OutputGraphWidth} height={height} className="bg-red-100">
-                <Group left={60}> {/* Offset entire group to make room for label */}
+            <svg width={OutputGraphWidth - margin.right - margin.left} height={OutputGraphHeight + margin.bottom} className="bg-red-100">
+                <Group left={margin.left} top={margin.top}> {/* Offset entire group to make room for label */}
                     {/* Y-Axis with Units */}
-                    <AxisLeft
+                    <Axis
                     scale={yAxisScale}
                     left={0}
                     stroke="black"
                     tickStroke="black"
+                    orientation="left"
+                    hideZero={false}
                     tickLabelProps={() => ({
                         fill: 'black',
                         fontSize: 12,
                         textAnchor: 'end',
                     })}
-                    label="Split"
-                    labelOffset={30} /* Negative offset pulls label toward left */
+                    label="Split (s/500m)"
+                    labelOffset={30}
                     labelClassName="text-base"
+                    />
+
+                    {/* X-Axis with Units */}
+                    <Axis
+                    scale={xAxisScale}
+                    top={height}
+                    left={0}
+                    // stroke="black"
+                    // tickStroke="black"
+                    tickLabelProps={() => ({
+                        fill: 'black',
+                        fontSize: 12,
+                        textAnchor: 'end',
+                    })}
+                    label="Distance (m)"
+                    labelOffset={15}
+                    labelClassName="text-base"
+                    numTicks={number_of_divisions}
                     />
 
                     {/* BARS */}
