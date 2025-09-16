@@ -1,11 +1,14 @@
-import { scaleBand, scaleLinear } from "@visx/scale";
+import { scaleLinear } from "@visx/scale";
 import { Bar, LinePath } from "@visx/shape";
+import { AxisLeft } from '@visx/axis';
+import { Group } from '@visx/group';
 
-const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight, slowestPermissibleSplit}) => {
+const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight, slowestPermissibleSplit, OutputGraphMargin}) => {
     // console.log(computedData);
 
     const width = OutputGraphWidth;
     const height = OutputGraphHeight;
+    const margin = OutputGraphMargin;
 
     // Compute XY coordinates for each point (one per division)
     let number_of_divisions = computedData.number_of_divisions;
@@ -43,6 +46,12 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         padding: 0.0,
     });
 
+    const yAxisScale = scaleLinear({
+        domain: [slowestPermissibleSplit, 0],
+        range: [height, 0],
+        padding: 0.0,
+    });
+
     const barWidth = width / number_of_divisions;
     const barCoordinates = []
     // const barCoordinates = point_coordinates_absolute.map((x) => {x});
@@ -56,23 +65,44 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
     // console.log(`width: ${OutputGraphWidth}`);
     // console.log(`barWidth: ${barWidth}`);
     // console.log(`bar_: ${barHeightZ}`)
-    
 
 
-    
+
     return(
-    <>
-        <svg width={OutputGraphWidth} height={height} className="bg-red-100">
-            {/* BARS */}
-            {barCoordinates.map(p => {
-                const barHeight = p.y; // because in an svg, the top is 0
-                {/* console.log(`barHeight: ${barHeight}`) */}
-                const barX = p.x;
-                const barY = height - barHeight;
-                {/* console.log(`barY: ${barY}`) */}
-            
-                return (
-                    <Bar
+    <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
+        {/* <div id="yAxisLabelWrapper" className="w-full h-{height} flex flex-col items-end bg-pink-500">
+            <span id="yAxisLabel" className="bg-green-400">0:00</span>
+            <span id="yAxisLabel" className="bg-green-400">1:30</span>
+            <span id="yAxisLabel" className="bg-green-400">3:00</span>
+        </div>
+
+        <div id="graphAndXAxisLabel" className="block center bg-pink-300"> */}
+            <svg width={OutputGraphWidth} height={height} className="bg-red-100">
+                <Group left={60}> {/* Offset entire group to make room for label */}
+                    {/* Y-Axis with Units */}
+                    <AxisLeft
+                    scale={yAxisScale}
+                    left={0}
+                    stroke="black"
+                    tickStroke="black"
+                    tickLabelProps={() => ({
+                        fill: 'black',
+                        fontSize: 12,
+                        textAnchor: 'end',
+                    })}
+                    label="Split"
+                    labelOffset={30} /* Negative offset pulls label toward left */
+                    labelClassName="text-base"
+                    />
+
+                    {/* BARS */}
+                    {barCoordinates.map(p => {
+                    const barHeight = p.y;
+                    const barX = p.x;
+                    const barY = height - barHeight;
+
+                    return (
+                        <Bar
                         key={p.x}
                         x={barX}
                         y={barY}
@@ -80,23 +110,18 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
                         height={barHeight}
                         fill="steelblue"
                         stroke="red"
-                        strokeWidth={1}   
-                    >    
-                    </Bar>
-                );
-            })}
+                        strokeWidth={1}
+                        />
+                    );
+                    })}
+                </Group>
+            </svg>
 
-            {/* LINE
-            <LinePath
-                data={point_coordinates_absolute}
-                x={p => xScale(p[0])}
-                y={p => yScale(p[1])}
-                stroke="black"
-                strokeWidth={2}
-            >
-            </LinePath> */}
-        </svg>
-    </>
+            {/* <text id="xAxisLabel" className="block bg-black text-center">
+                X Axis Label
+            </text>
+        </div> */}
+    </div>
     );
 };
 

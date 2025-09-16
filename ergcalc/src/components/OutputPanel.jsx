@@ -5,8 +5,9 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted, slowestPermissibleS
 
     const [OutputGraphRender, setOutputGraphRender] = useState(0);
 
-    const [OutputGraphWidth, setOutputGraphWidth] = useState(400);
-    const [OutputGraphHeight, setOutputGraphheight] = useState(180);
+    const [OutputGraphWidth, setOutputGraphWidth] = useState(300);
+    const [OutputGraphHeight, setOutputGraphheight] = useState(200);
+    const [OutputGraphMargin, setOutputGraphMargin] = useState({ top: 20, right: 20, bottom: 20, left: 20});
 
     if (hasInputsBeenSubmitted) {
         return (
@@ -21,6 +22,7 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted, slowestPermissibleS
                 computedData={computedData}
                 OutputGraphWidth={OutputGraphWidth}
                 OutputGraphHeight={OutputGraphHeight}
+                OutputGraphMargin={OutputGraphMargin}
                 slowestPermissibleSplit={slowestPermissibleSplit}
                 />
             {/* <span id="final-divisional-split">Final split per division:</span> */}
