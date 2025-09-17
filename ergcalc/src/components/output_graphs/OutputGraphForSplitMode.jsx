@@ -155,7 +155,7 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
                             <Circle
                                 key={`point_${i}`}
                                 cx={p.x}
-                                cy={p.y}
+                                cy={height - p.y}
                                 r={4}
                                 fill="orange"
                             />
