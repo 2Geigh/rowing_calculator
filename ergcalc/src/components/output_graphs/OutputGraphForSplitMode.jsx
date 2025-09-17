@@ -83,7 +83,7 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
 
             <div id="graphAndXAxisLabel" className="block center bg-pink-300">
-                <svg width={OutputGraphWidth - margin.right - margin.left} height={OutputGraphHeight + margin.bottom} className="bg-red-100">
+                <svg width={OutputGraphWidth - margin.right} height={OutputGraphHeight + margin.bottom} className="bg-red-100">
                     <Group left={margin.left} top={margin.top}> {/* Offset entire group to make room for label */}
                         {/* Y-Axis with Units */}
                         <Axis
