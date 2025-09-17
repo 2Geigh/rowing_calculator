@@ -2,6 +2,7 @@ import { scaleLinear } from "@visx/scale";
 import { Bar, Line, LinePath, Circle } from "@visx/shape";
 import { Axis } from '@visx/axis';
 import { Group } from '@visx/group';
+import { useState, useEffect } from "react";
 
 const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight, slowestPermissibleSplit, OutputGraphMargin}) => {
 
@@ -68,15 +69,23 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
 
     // Prepare input data for <LinearPath/>
     const pointCoordinates = []
+    let to_put_into_BarAndCircleHeights = {}
     for (let i = 0; i < number_of_divisions; i++) {
         let pointX = (i * ((width) / number_of_divisions)) + (barWidth/2);
         let pointY = yScale(y_coordinates_absolute[i]);
+        
         pointCoordinates[i] = {x: pointX, y: pointY};
+        to_put_into_BarAndCircleHeights[i] = pointY;
     };
     const accessors = {
         xAccessor: (d) => d.x,
         yAccessor: (d) => height - d.y,
     };
+
+    const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights)
+    console.log(BarAndCircleHeights)
+
+    useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData])
     
 
     return(
