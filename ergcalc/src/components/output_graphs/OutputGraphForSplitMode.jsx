@@ -99,115 +99,164 @@ const OutputGraphForSplitMode = ({
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [cursorStyle, setCursorStyle] = useState("pointer");
 
-    const handleMouseMove = (event) => {
+    const detectIfCursorIsWithinGraphingBounds = (event) => {
+        let svg_hitbox = event.target.getBoundingClientRect();
+
+        // Transform absolute coordinates into relative coordinates with respect to the top and left of the <svg> element
+        const y_MAX_absolute = svg_hitbox.bottom;
+        const y_MIN_absolute = svg_hitbox.top;
+
+        let mouseY_absolute = event.clientY;
+        let mouseY_relative = mouseY_absolute - svg_hitbox.top - margin.top;
+
+        const svg_height = height;
+        let mousePercentage = mouseY_relative / svg_height * 100;
+
+        let mouseIsWithinVerticalBounds = (mouseY_relative >= 0) && (mouseY_absolute <= (svg_hitbox.bottom - margin.bottom));
+        let mouseIsWithinBounds = mouseIsWithinVerticalBounds // This is here for if you want to implement horizontal bounds in the future
+
+
+
+        if (mouseIsWithinBounds) {
+            console.log(`\n`)
+            console.log(`You're hovering over <Group/> at ABS y=${mouseY_absolute}`)
+            console.log(`You're hovering over <Group/> at REL y=${mouseY_relative}`)
+            console.log(`${mousePercentage}%`)
+            console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
+        }
+        else {
+            console.log(`Cursor is not within graphing bounds.`)
+            console.log(`${mousePercentage}%`)
+        }
+
+        // event.stopPropagation();
+    };
+
+    const handleMouseMove_CIRCLE = (event) => {
         let y = event.clientY;
 
         if (isMouseDown) {
-            console.log(`You're clicking at y=${y}`);
+            // console.log(`You're clicking at y=${y}`);
         }
 
         else {
-            console.log(`You're hovering at y=${y}`);
+            // console.log(`You're hovering at y=${y}`);
         }
-    }
+    };
 
-    const handleMouseUp = (event) => {
+    const handleMouseUp_CIRCLE = (event) => {
+        let y = event.clientY;
+
         setIsMouseDown(false);
         setCursorStyle("pointer");
-    }
+        
+        // console.log(`You're hovering at y=${y}`);
+    };
 
-    const handleMouseDown = (event) => {
+    const handleMouseDown_CIRCLE = (event) => {
+        let y = event.clientY;
+
         setIsMouseDown(true);
         setCursorStyle("grab");
-    }
+
+        // console.log(`You're clicking at y=${y}`);
+    };
 
 
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
 
             <div id="graphAndXAxisLabel" className="block center bg-pink-300">
-                <svg width={OutputGraphWidth - margin.right} height={OutputGraphHeight + margin.bottom} className="bg-red-100">
-                    <Group left={margin.left} top={margin.top}> {/* Offset entire group to make room for label */}
-                        {/* Y-Axis with Units */}
-                        <Axis
-                        scale={yAxisScale}
-                        left={0}
-                        stroke="black"
-                        tickStroke="black"
-                        orientation="left"
-                        hideZero={false}
-                        tickLabelProps={() => ({
-                            fill: 'black',
-                            fontSize: 12,
-                            textAnchor: 'end',
-                        })}
-                        label="Split (s/500m)"
-                        labelOffset={30}
-                        labelClassName="text-base"
-                        />
+                <svg
+                    width={OutputGraphWidth - margin.right}
+                    height={OutputGraphHeight + margin.bottom}
+                    className="bg-red-100"
+                    onMouseMove={detectIfCursorIsWithinGraphingBounds}
+                    >
+                        <Group
+                            left={margin.left}
+                            top={margin.top}> {/* Offset entire group to make room for label */}
+                                
+                                {/* Y-Axis with Units */}
+                                <Axis
+                                scale={yAxisScale}
+                                left={0}
+                                stroke="black"
+                                tickStroke="black"
+                                orientation="left"
+                                hideZero={false}
+                                tickLabelProps={() => ({
+                                    fill: 'black',
+                                    fontSize: 12,
+                                    textAnchor: 'end',
+                                })}
+                                label="Split (s/500m)"
+                                labelOffset={30}
+                                labelClassName="text-base"
+                                />
 
-                        {/* X-Axis with Units */}
-                        <Axis
-                        scale={xAxisScale}
-                        top={height}
-                        left={0}
-                        // stroke="black"
-                        // tickStroke="black"
-                        tickLabelProps={() => ({
-                            fill: 'black',
-                            fontSize: 12,
-                            textAnchor: 'end',
-                        })}
-                        label="Distance (m)"
-                        labelOffset={15}
-                        labelClassName="text-base"
-                        numTicks={number_of_divisions}
-                        />
+                                {/* X-Axis with Units */}
+                                <Axis
+                                scale={xAxisScale}
+                                top={height}
+                                left={0}
+                                // stroke="black"
+                                // tickStroke="black"
+                                tickLabelProps={() => ({
+                                    fill: 'black',
+                                    fontSize: 12,
+                                    textAnchor: 'end',
+                                })}
+                                label="Distance (m)"
+                                labelOffset={15}
+                                labelClassName="text-base"
+                                numTicks={number_of_divisions}
+                                />
 
-                        {/* BARS */}
-                        {barCoordinates.map(p => {
-                        const barHeight = p.y;
-                        const barX = p.x;
-                        const barY = height - barHeight;
+                                {/* BARS */}
+                                {/* {barCoordinates.map(p => {
+                                const barHeight = p.y;
+                                const barX = p.x;
+                                const barY = height - barHeight;
 
-                        return (
-                            <Bar
-                            key={p.x}
-                            x={barX}
-                            y={barY}
-                            width={barWidth}
-                            height={barHeight}
-                            fill="steelblue"
-                            stroke="red"
-                            strokeWidth={1}
-                            />
-                        );
-                        })}
+                                return (
+                                    <Bar
+                                    key={p.x}
+                                    x={barX}
+                                    y={barY}
+                                    width={barWidth}
+                                    height={barHeight}
+                                    fill="steelblue"
+                                    stroke="red"
+                                    strokeWidth={1}
+                                    />
+                                );
+                                })} */}
 
-                        {/* LINE */}
-                        <LinePath
-                            data={pointCoordinates}
-                            x={accessors.xAccessor}
-                            y={(accessors.yAccessor)}
-                            stroke="#6B1400"
-                            strokeWidth={2}
-                        />
+                                {/* LINE */}
+                                {/* <LinePath
+                                    data={pointCoordinates}
+                                    x={accessors.xAccessor}
+                                    y={(accessors.yAccessor)}
+                                    stroke="#6B1400"
+                                    strokeWidth={2}
+                                /> */}
 
-                        {/* CIRCLES */}
-                        {pointCoordinates.map((p, i) => (
-                            <Circle
-                                key={`point_${i}`}
-                                cx={p.x}
-                                cy={height - p.y}
-                                r={20}
-                                fill="orange"
-                                onMouseMove={handleMouseMove}
-                                onMouseDown={handleMouseDown}
-                                onMouseUp={handleMouseUp}
-                                cursor={cursorStyle}
-                            />
-                        ))}
-                    </Group>
+                                {/* CIRCLES */}
+                                {pointCoordinates.map((p, i) => (
+                                    <Circle
+                                        key={`point_${i}`}
+                                        cx={p.x}
+                                        cy={height - p.y}
+                                        r={20}
+                                        fill="orange"
+                                        onMouseMove={handleMouseMove_CIRCLE}
+                                        onMouseDown={handleMouseDown_CIRCLE}
+                                        onMouseUp={handleMouseUp_CIRCLE}
+                                        cursor={cursorStyle}
+                                    />
+                                ))}
+                        </Group>
                 </svg>
             </div>
         </div>
