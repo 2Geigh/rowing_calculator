@@ -38,6 +38,12 @@ const App = () => {
 
     const slowestPermissibleSplit = 180; // 3:00 / 500m
 
+    // let [isMouseDown, setIsMouseDown] = useState(false);
+    // const handleMouseUp = (event) => {
+    //         setIsMouseDown(false);
+    //         console.log(`You lifted the mouse!`);
+    // }
+
     return (
         <>
             <InputPanel
@@ -58,6 +64,9 @@ const App = () => {
                 hasInputsBeenSubmitted={hasInputsBeenSubmitted}
 
                 slowestPermissibleSplit={slowestPermissibleSplit}
+
+                // isMouseDown={isMouseDown}
+                // setIsMouseDown={setIsMouseDown}
             />
         </>
     );

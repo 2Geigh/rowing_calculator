@@ -2,7 +2,14 @@ import InputField from './InputField';
 import formatTime from '../utils/timeFormat'
 import trimLeadingZeroes from '../utils/validation';
 
-const InputPanel = ( { dataToCompute, setDataToCompute, computedData, setComputedData, setHasInputsBeenSubmitted, slowestPermissibleSplit } ) => {
+const InputPanel = ( {
+                        dataToCompute,
+                        setDataToCompute,
+                        computedData,
+                        setComputedData,
+                        setHasInputsBeenSubmitted,
+                        slowestPermissibleSplit
+                    } ) => {
 
     const handleChange = (e) => {
         // e is the event

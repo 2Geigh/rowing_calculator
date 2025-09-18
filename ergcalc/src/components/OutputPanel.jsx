@@ -1,7 +1,13 @@
 import OutputGraphForSplitMode from "./output_graphs/OutputGraphForSplitMode";
 import { useState } from "react";
 
-const OutputPanel = ( {computedData, hasInputsBeenSubmitted, slowestPermissibleSplit} ) => {
+const OutputPanel = ( {
+                        computedData,
+                        hasInputsBeenSubmitted, 
+                        slowestPermissibleSplit,
+                        // isMouseDown,
+                        // setIsMouseDown
+                    } ) => {
 
     const [OutputGraphRender, setOutputGraphRender] = useState(0);
 
@@ -35,7 +41,12 @@ const OutputPanel = ( {computedData, hasInputsBeenSubmitted, slowestPermissibleS
                 OutputGraphHeight={OutputGraphHeight}
                 OutputGraphMargin={OutputGraphMargin}
                 slowestPermissibleSplit={slowestPermissibleSplit}
-                />
+
+                // isMouseDown={isMouseDown}
+                // setIsMouseDown={setIsMouseDown}
+
+                // onMouseUp={setIsMouseDown(false)}
+            />
             {/* <span id="final-divisional-split">Final split per division:</span> */}
         </section>
     );

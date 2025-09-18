@@ -4,7 +4,17 @@ import { Axis } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useState, useEffect } from "react";
 
-const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGraphRender, OutputGraphWidth, OutputGraphHeight, slowestPermissibleSplit, OutputGraphMargin}) => {
+const OutputGraphForSplitMode = ({
+                                    computedData,
+                                    OutputGraphRender,
+                                    setOutputGraphRender,
+                                    OutputGraphWidth,
+                                    OutputGraphHeight, 
+                                    slowestPermissibleSplit, 
+                                    OutputGraphMargin,
+                                    // isMouseDown,
+                                    // setIsMouseDown
+                                }) => {
 
     const margin = OutputGraphMargin;
     const width = OutputGraphWidth / (1.5);
@@ -83,10 +93,34 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
     };
 
     const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights)
-    console.log(BarAndCircleHeights)
-
     useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData])
-    
+
+
+    const [isMouseDown, setIsMouseDown] = useState(false);
+    const [cursorStyle, setCursorStyle] = useState("pointer");
+
+    const handleMouseMove = (event) => {
+        let y = event.clientY;
+
+        if (isMouseDown) {
+            console.log(`You're clicking at y=${y}`);
+        }
+
+        else {
+            console.log(`You're hovering at y=${y}`);
+        }
+    }
+
+    const handleMouseUp = (event) => {
+        setIsMouseDown(false);
+        setCursorStyle("pointer");
+    }
+
+    const handleMouseDown = (event) => {
+        setIsMouseDown(true);
+        setCursorStyle("grab");
+    }
+
 
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
@@ -165,8 +199,12 @@ const OutputGraphForSplitMode = ({ computedData, OutputGraphRender, setOutputGra
                                 key={`point_${i}`}
                                 cx={p.x}
                                 cy={height - p.y}
-                                r={4}
+                                r={20}
                                 fill="orange"
+                                onMouseMove={handleMouseMove}
+                                onMouseDown={handleMouseDown}
+                                onMouseUp={handleMouseUp}
+                                cursor={cursorStyle}
                             />
                         ))}
                     </Group>
