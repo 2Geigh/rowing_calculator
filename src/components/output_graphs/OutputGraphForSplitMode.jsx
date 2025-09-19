@@ -91,13 +91,15 @@ const OutputGraphForSplitMode = ({
         xAccessor: (d) => d.x,
         yAccessor: (d) => height - d.y,
     };
+    
+    const [pointCoordinatesState, setPointCoordinatesState] = useState(pointCoordinates);
 
     const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights)
     useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData])
 
 
     const [isMouseDown, setIsMouseDown] = useState(false);
-    const [cursorStyle, setCursorStyle] = useState("pointer");
+    const [cursorStyle, setCursorStyle] = useState("row-resize");
 
     const detectIfCursorIsWithinGraphingBounds = (event) => {
         let svg_hitbox = event.target.getBoundingClientRect();
@@ -122,12 +124,12 @@ const OutputGraphForSplitMode = ({
             console.log(`You're hovering over <Group/> at ABS y=${mouseY_absolute}`)
             console.log(`You're hovering over <Group/> at REL y=${mouseY_relative}`)
             console.log(`${mousePercentage}%`)
-            console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
+            // console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
         }
-        else {
-            console.log(`Cursor is not within graphing bounds.`)
-            console.log(`${mousePercentage}%`)
-        }
+        // else {
+        //     console.log(`Cursor is not within graphing bounds.`)
+        //     console.log(`${mousePercentage}%`)
+        // }
 
         // event.stopPropagation();
     };
@@ -148,7 +150,7 @@ const OutputGraphForSplitMode = ({
         let y = event.clientY;
 
         setIsMouseDown(false);
-        setCursorStyle("pointer");
+        setCursorStyle("row-resize");
         
         // console.log(`You're hovering at y=${y}`);
     };
