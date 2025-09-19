@@ -2,7 +2,7 @@ import { scaleLinear } from "@visx/scale";
 import { Bar, Line, LinePath, Circle } from "@visx/shape";
 import { Axis } from '@visx/axis';
 import { Group } from '@visx/group';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const OutputGraphForSplitMode = ({
                                     computedData,
@@ -92,21 +92,26 @@ const OutputGraphForSplitMode = ({
         yAccessor: (d) => height - d.y,
     };
     
-    const [pointCoordinatesState, setPointCoordinatesState] = useState(pointCoordinates);
+    // const [pointCoordinatesState, setPointCoordinatesState] = useState(pointCoordinates);
 
     const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights)
     useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData])
+    console.log(BarAndCircleHeights);
+
+    let pointThatsBeingDraggedByTheUser = 0;
 
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [cursorStyle, setCursorStyle] = useState("row-resize");
 
+    let isMouseDraggingPointOnPlot = false;
+
     const detectIfCursorIsWithinGraphingBounds = (event) => {
-        let svg_hitbox = event.target.getBoundingClientRect();
+        let svg_hitbox = document.getElementById("outputGraph").getBoundingClientRect();
 
         // Transform absolute coordinates into relative coordinates with respect to the top and left of the <svg> element
-        const y_MAX_absolute = svg_hitbox.bottom;
-        const y_MIN_absolute = svg_hitbox.top;
+        // const y_MAX_absolute = svg_hitbox.bottom;
+        // const y_MIN_absolute = svg_hitbox.top;
 
         let mouseY_absolute = event.clientY;
         let mouseY_relative = mouseY_absolute - svg_hitbox.top - margin.top;
@@ -120,16 +125,24 @@ const OutputGraphForSplitMode = ({
 
 
         if (mouseIsWithinBounds) {
-            console.log(`\n`)
+
+            // if (isMouseDraggingPointOnPlot) {
+            //     setBarAndCircleHeights({
+            //         ...BarAndCircleHeights, 
+            //     });
+            // }
+
+            console.clear();            
             console.log(`You're hovering over <Group/> at ABS y=${mouseY_absolute}`)
             console.log(`You're hovering over <Group/> at REL y=${mouseY_relative}`)
             console.log(`${mousePercentage}%`)
             // console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
         }
-        // else {
-        //     console.log(`Cursor is not within graphing bounds.`)
-        //     console.log(`${mousePercentage}%`)
-        // }
+        else {
+            console.clear();
+            console.log(`Cursor is not within graphing bounds.`)
+            // console.log(`${mousePercentage}%`)
+        }
 
         // event.stopPropagation();
     };
@@ -151,6 +164,7 @@ const OutputGraphForSplitMode = ({
 
         setIsMouseDown(false);
         setCursorStyle("row-resize");
+        isMouseDraggingPointOnPlot = false;
         
         // console.log(`You're hovering at y=${y}`);
     };
@@ -160,20 +174,21 @@ const OutputGraphForSplitMode = ({
 
         setIsMouseDown(true);
         setCursorStyle("grab");
+        isMouseDraggingPointOnPlot = true;
 
         // console.log(`You're clicking at y=${y}`);
     };
 
 
     return(
-        <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
+        <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200" onMouseMove={detectIfCursorIsWithinGraphingBounds}>
 
             <div id="graphAndXAxisLabel" className="block center bg-pink-300">
                 <svg
                     width={OutputGraphWidth - margin.right}
                     height={OutputGraphHeight + margin.bottom}
                     className="bg-red-100"
-                    onMouseMove={detectIfCursorIsWithinGraphingBounds}
+                    // onMouseMoveCapture={detectIfCursorIsWithinGraphingBounds}
                     >
                         <Group
                             left={margin.left}
@@ -247,6 +262,7 @@ const OutputGraphForSplitMode = ({
                                 {/* CIRCLES */}
                                 {pointCoordinates.map((p, i) => (
                                     <Circle
+                                        id={`point_${i}`}
                                         key={`point_${i}`}
                                         cx={p.x}
                                         cy={height - p.y}
