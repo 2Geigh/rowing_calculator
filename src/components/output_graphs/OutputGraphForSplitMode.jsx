@@ -143,6 +143,10 @@ const OutputGraphForSplitMode = ({
 
     };
 
+    const handleMouseUp_CONTAINER = (event) => {
+        isMouseDraggingPointOnPlot.current = false;
+    };
+
     const handleMouseMove_CIRCLE = (event) => {
         pointThatsBeingDraggedByTheUser.current = event.target.id.slice(-1);
         pointThatsBeingDraggedByTheUser.y = BarAndCircleHeights[pointThatsBeingDraggedByTheUser.current];
@@ -156,16 +160,20 @@ const OutputGraphForSplitMode = ({
         pointThatsBeingDraggedByTheUser.current = null;
     };
 
-    const handleMouseDown_CIRCLE = async (event) => {
+    const handleMouseDown_CIRCLE = (event) => {
         isMouseDown.current = true;
         setCursorStyle("grab");
         isMouseDraggingPointOnPlot.current = true;
     };
 
+    const handleMouseLeave_CIRCLE = (event) => {
+        // isMouseDraggingPointOnPlot.current = false;
+    };
+
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
 
-            <div id="graphAndXAxisLabel" className="block center bg-pink-300" onMouseMove={detectIfCursorIsWithinGraphingBounds}>
+            <div id="graphAndXAxisLabel" className="block center bg-pink-300" onMouseMove={detectIfCursorIsWithinGraphingBounds} onMouseUp={handleMouseUp_CONTAINER}>
                 <svg
                     width={OutputGraphWidth - margin.right}
                     height={OutputGraphHeight + margin.bottom}
@@ -213,10 +221,10 @@ const OutputGraphForSplitMode = ({
                                 />
 
                                 {/* BARS */}
-                                {/* {barCoordinates.map(p => {
-                                const barHeight = p.y;
+                                {barCoordinates.map((p,i) => {
+                                const barHeight = /*p.y*/height - BarAndCircleHeights[i];
                                 const barX = p.x;
-                                const barY = height - barHeight;
+                                const barY = BarAndCircleHeights[i];
 
                                 return (
                                     <Bar
@@ -230,7 +238,7 @@ const OutputGraphForSplitMode = ({
                                     strokeWidth={1}
                                     />
                                 );
-                                })} */}
+                                })}
 
                                 {/* LINE */}
                                 {/* <LinePath
@@ -253,6 +261,7 @@ const OutputGraphForSplitMode = ({
                                         onMouseMove={handleMouseMove_CIRCLE}
                                         onMouseDown={handleMouseDown_CIRCLE}
                                         onMouseUp={handleMouseUp_CIRCLE}
+                                        onMouseLeave={handleMouseLeave_CIRCLE}
                                         cursor={cursorStyle}
                                     />
                                 ))}
