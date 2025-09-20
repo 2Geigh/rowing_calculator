@@ -6,8 +6,8 @@ import { useState, useEffect, useRef } from "react";
 
 const OutputGraphForSplitMode = ({
                                     computedData,
-                                    OutputGraphRender,
-                                    setOutputGraphRender,
+                                    // OutputGraphRender,
+                                    // setOutputGraphRender,
                                     OutputGraphWidth,
                                     OutputGraphHeight, 
                                     slowestPermissibleSplit, 
@@ -92,98 +92,80 @@ const OutputGraphForSplitMode = ({
         yAccessor: (d) => height - d.y,
     };
     
-    // const [pointCoordinatesState, setPointCoordinatesState] = useState(pointCoordinates);
-
     const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights)
     useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData])
-    console.log(BarAndCircleHeights);
 
-    let pointThatsBeingDraggedByTheUser = 0;
-
-
-    const [isMouseDown, setIsMouseDown] = useState(false);
+    const isMouseDown = useRef(false);
     const [cursorStyle, setCursorStyle] = useState("row-resize");
+    const pointThatsBeingDraggedByTheUser = useRef(null);
 
-    let isMouseDraggingPointOnPlot = false;
+    const isMouseDraggingPointOnPlot = useRef(false);
+    const mouseY_relative = useRef(null);
+    let mouseIsWithinBounds = false;
+    let mousePercentage;
 
     const detectIfCursorIsWithinGraphingBounds = (event) => {
         let svg_hitbox = document.getElementById("outputGraph").getBoundingClientRect();
 
-        // Transform absolute coordinates into relative coordinates with respect to the top and left of the <svg> element
-        // const y_MAX_absolute = svg_hitbox.bottom;
-        // const y_MIN_absolute = svg_hitbox.top;
-
         let mouseY_absolute = event.clientY;
-        let mouseY_relative = mouseY_absolute - svg_hitbox.top - margin.top;
+        mouseY_relative.current = mouseY_absolute - svg_hitbox.top - margin.top;
 
         const svg_height = height;
-        let mousePercentage = mouseY_relative / svg_height * 100;
+        mousePercentage = mouseY_relative.current / svg_height * 100;
 
-        let mouseIsWithinVerticalBounds = (mouseY_relative >= 0) && (mouseY_absolute <= (svg_hitbox.bottom - margin.bottom));
-        let mouseIsWithinBounds = mouseIsWithinVerticalBounds // This is here for if you want to implement horizontal bounds in the future
+        let mouseIsWithinVerticalBounds = (mouseY_relative.current >= 0) && (mouseY_absolute <= (svg_hitbox.bottom - margin.bottom));
+        mouseIsWithinBounds = mouseIsWithinVerticalBounds // This is here for if you want to implement horizontal bounds in the future
 
-
-
-        if (mouseIsWithinBounds) {
-
-            // if (isMouseDraggingPointOnPlot) {
-            //     setBarAndCircleHeights({
-            //         ...BarAndCircleHeights, 
-            //     });
+        if (mouseIsWithinBounds && isMouseDraggingPointOnPlot.current) {
+            // while (isMouseDraggingPointOnPlot) {
+                setBarAndCircleHeights({...BarAndCircleHeights, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
             // }
-
-            console.clear();            
-            console.log(`You're hovering over <Group/> at ABS y=${mouseY_absolute}`)
-            console.log(`You're hovering over <Group/> at REL y=${mouseY_relative}`)
-            console.log(`${mousePercentage}%`)
-            // console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
-        }
-        else {
-            console.clear();
-            console.log(`Cursor is not within graphing bounds.`)
-            // console.log(`${mousePercentage}%`)
         }
 
-        // event.stopPropagation();
+        else if (!mouseIsWithinVerticalBounds) {
+            isMouseDraggingPointOnPlot.current = false;
+            handleMouseUp_CIRCLE();
+        }
+
+        // if (mouseIsWithinBounds) {
+
+        //     console.clear();            
+        //     console.log(`You're hovering at ABS y=${mouseY_absolute}`)
+        //     console.log(`You're hovering at REL y=${mouseY_relative.current}`)
+        //     console.log(`${mousePercentage}%`)
+        //     console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
+        // }
+        // else {
+        //     console.clear();
+        //     console.log(`Cursor is not within graphing bounds.`)
+        //     console.log(`${mousePercentage}%`)
+        // }
+
     };
 
     const handleMouseMove_CIRCLE = (event) => {
-        let y = event.clientY;
-
-        if (isMouseDown) {
-            // console.log(`You're clicking at y=${y}`);
-        }
-
-        else {
-            // console.log(`You're hovering at y=${y}`);
-        }
+        pointThatsBeingDraggedByTheUser.current = event.target.id.slice(-1);
+        pointThatsBeingDraggedByTheUser.y = BarAndCircleHeights[pointThatsBeingDraggedByTheUser.current];
+        console.log(pointThatsBeingDraggedByTheUser)
     };
 
     const handleMouseUp_CIRCLE = (event) => {
-        let y = event.clientY;
-
-        setIsMouseDown(false);
+        isMouseDown.current = false;
         setCursorStyle("row-resize");
-        isMouseDraggingPointOnPlot = false;
-        
-        // console.log(`You're hovering at y=${y}`);
+        isMouseDraggingPointOnPlot.current = false;
+        pointThatsBeingDraggedByTheUser.current = null;
     };
 
-    const handleMouseDown_CIRCLE = (event) => {
-        let y = event.clientY;
-
-        setIsMouseDown(true);
+    const handleMouseDown_CIRCLE = async (event) => {
+        isMouseDown.current = true;
         setCursorStyle("grab");
-        isMouseDraggingPointOnPlot = true;
-
-        // console.log(`You're clicking at y=${y}`);
+        isMouseDraggingPointOnPlot.current = true;
     };
-
 
     return(
-        <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200" onMouseMove={detectIfCursorIsWithinGraphingBounds}>
+        <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
 
-            <div id="graphAndXAxisLabel" className="block center bg-pink-300">
+            <div id="graphAndXAxisLabel" className="block center bg-pink-300" onMouseMove={detectIfCursorIsWithinGraphingBounds}>
                 <svg
                     width={OutputGraphWidth - margin.right}
                     height={OutputGraphHeight + margin.bottom}
@@ -265,7 +247,7 @@ const OutputGraphForSplitMode = ({
                                         id={`point_${i}`}
                                         key={`point_${i}`}
                                         cx={p.x}
-                                        cy={height - p.y}
+                                        cy={BarAndCircleHeights[i]}
                                         r={20}
                                         fill="orange"
                                         onMouseMove={handleMouseMove_CIRCLE}
