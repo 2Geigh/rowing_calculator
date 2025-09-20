@@ -3,9 +3,11 @@ import { Bar, Line, LinePath, Circle } from "@visx/shape";
 import { Axis } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useState, useEffect, useRef } from "react";
+import arrayMean from "ml-array-mean";
 
 const OutputGraphForSplitMode = ({
                                     computedData,
+                                    setComputedData,
                                     // OutputGraphRender,
                                     // setOutputGraphRender,
                                     OutputGraphWidth,
@@ -92,8 +94,8 @@ const OutputGraphForSplitMode = ({
         yAccessor: (d) => height - d.y,
     };
     
-    const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights)
-    useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData])
+    const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights);
+    useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData]);
 
     const isMouseDown = useRef(false);
     const [cursorStyle, setCursorStyle] = useState("row-resize");
@@ -119,6 +121,51 @@ const OutputGraphForSplitMode = ({
         if (mouseIsWithinBounds && isMouseDraggingPointOnPlot.current) {
             // while (isMouseDraggingPointOnPlot) {
                 setBarAndCircleHeights({...BarAndCircleHeights, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
+                
+                // UPDATE COMPUTED DATA
+                // const [computedData, setComputedData] = useState({
+                //     final_time: "",
+                //     final_time_display: "",
+                //     final_average_split: "",
+                //     final_average_split_display: "",
+                //     number_of_divisions: "",
+                //     total_distance: "",
+                // });
+                
+                let plotted_circles = document.getElementsByClassName("plotted_circle");
+                let plotted_circles_y_values = [];
+                let circle_height_proportions = [];
+                let plotted_circles_splits = [];
+                let new_final_average_split;
+                let new_final_time;
+
+                console.clear();
+                // Get the height values of every circle in the plot
+                for (let i=0; i<plotted_circles.length; i++) {
+                    plotted_circles_y_values.push(plotted_circles[i].cy.animVal.value);
+                }
+
+                // Convert all the height values into splits
+                for (let i=0; i<plotted_circles_y_values.length; i++) {
+                    circle_height_proportions.push(plotted_circles_y_values[i] / svg_height);
+                }
+                console.log(`%`)
+                console.log(circle_height_proportions)
+
+
+                // THE ISSUE LIES IN THIS FOR LOOP
+                for (let i=0; i<circle_height_proportions.length; i++) {
+                    plotted_circles_splits.push(circle_height_proportions[i] * slowestPermissibleSplit);
+                }
+                console.log(plotted_circles_splits);
+
+                // Compute the average final split from them
+                new_final_average_split = arrayMean(plotted_circles_splits);
+                console.log(`new_final_average_split: ${new_final_average_split}`);
+
+                // Recompute final time from the new average final split
+                new_final_time = new_final_average_split * total_distance / 500;
+                console.log(`new_final_time:${new_final_time}`);
             // }
         }
 
@@ -150,6 +197,9 @@ const OutputGraphForSplitMode = ({
     const handleMouseMove_CIRCLE = (event) => {
         pointThatsBeingDraggedByTheUser.current = event.target.id.slice(-1);
         pointThatsBeingDraggedByTheUser.y = BarAndCircleHeights[pointThatsBeingDraggedByTheUser.current];
+    };
+
+    const handleMouseEnter_CIRCLE = (event) => {
         console.log(pointThatsBeingDraggedByTheUser)
     };
 
@@ -253,6 +303,7 @@ const OutputGraphForSplitMode = ({
                                 {pointCoordinates.map((p, i) => (
                                     <Circle
                                         id={`point_${i}`}
+                                        className="plotted_circle"
                                         key={`point_${i}`}
                                         cx={p.x}
                                         cy={BarAndCircleHeights[i]}
@@ -262,6 +313,7 @@ const OutputGraphForSplitMode = ({
                                         onMouseDown={handleMouseDown_CIRCLE}
                                         onMouseUp={handleMouseUp_CIRCLE}
                                         onMouseLeave={handleMouseLeave_CIRCLE}
+                                        onMouseEnter={handleMouseEnter_CIRCLE}
                                         cursor={cursorStyle}
                                     />
                                 ))}

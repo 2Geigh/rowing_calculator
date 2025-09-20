@@ -3,6 +3,7 @@ import { useState } from "react";
 
 const OutputPanel = ( {
                         computedData,
+                        setComputedData,
                         hasInputsBeenSubmitted, 
                         slowestPermissibleSplit,
                         // isMouseDown,
@@ -37,6 +38,7 @@ const OutputPanel = ( {
                 OutputGraphRender={OutputGraphRender}
                 setOutputGraphRender={setOutputGraphRender}
                 computedData={computedData}
+                setComputedData={setComputedData}
                 OutputGraphWidth={OutputGraphWidth}
                 OutputGraphHeight={OutputGraphHeight}
                 OutputGraphMargin={OutputGraphMargin}

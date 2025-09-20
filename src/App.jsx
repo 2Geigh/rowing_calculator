@@ -60,6 +60,7 @@ const App = () => {
 
             <OutputPanel
                 computedData={computedData}
+                setComputedData={setComputedData}
 
                 hasInputsBeenSubmitted={hasInputsBeenSubmitted}
 
