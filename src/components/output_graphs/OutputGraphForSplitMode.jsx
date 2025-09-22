@@ -5,7 +5,7 @@ import { Group } from '@visx/group';
 import { useState, useEffect, useRef } from "react";
 
 import determineBaseCoordinates from "../../utils/OutputGraphForSplitMode/determineBaseCoordinates";
-import { xScale, yScale, xAxisScale, yAxisScale } from "../../utils/OutputGraphForSplitMode/scales"
+import { compute_xScale, compute_yScale, compute_xAxisScale, compute_yAxisScale} from "../../utils/OutputGraphForSplitMode/scales"
 import determineBarCoordinates from "../../utils/OutputGraphForSplitMode/determineBarCoordinates";
 import determinePointCoordinates from "../../utils/OutputGraphForSplitMode/determinePointCoordinates";
 
@@ -38,18 +38,23 @@ const OutputGraphForSplitMode = ({
     let y_coordinates_absolute = [];
     let x_coordinates_absolute = [];
     let x_axis_domain = [];
-    determineBaseCoordinates(x_axis_domain, pointCoordinates, y_coordinates_absolute, x_coordinates_absolute);
+    determineBaseCoordinates(x_axis_domain, point_coordinates_absolute, y_coordinates_absolute, x_coordinates_absolute);
+
+    // Compute scales
+    const xScale = compute_xScale(x_coordinates_absolute, width);
+    const yScale = compute_yScale(slowestPermissibleSplit, height);
+    const xAxisScale = compute_xAxisScale(x_axis_domain, width);
+    const yAxisScale = compute_yAxisScale(slowestPermissibleSplit, height);
 
     // Prepare input data for <Bar/>
     const barWidth = (width) / number_of_divisions;
-    const barCoordinates = []
-    determineBarCoordinates(number_of_divisions, width, barCoordinates);
+    const barCoordinates = [];
+    determineBarCoordinates(number_of_divisions, width, yScale, y_coordinates_absolute, barCoordinates);
 
     // Prepare input data for <LinearPath/>
-    const pointCoordinates = []
-    let to_put_into_BarAndCircleHeights = {}
-    determinePointCoordinates(number_of_divisions, width, barWidth, pointCoordinates, to_put_into_BarAndCircleHeights);
-
+    const pointCoordinates = [];
+    let to_put_into_BarAndCircleHeights = {};
+    determinePointCoordinates(number_of_divisions, width, barWidth, yScale, y_coordinates_absolute, pointCoordinates, to_put_into_BarAndCircleHeights);
 
     const accessors = {
         xAccessor: (d) => d.x,
