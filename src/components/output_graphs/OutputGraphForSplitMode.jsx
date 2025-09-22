@@ -3,19 +3,27 @@ import { Bar, Line, LinePath, Circle } from "@visx/shape";
 import { Axis } from '@visx/axis';
 import { Group } from '@visx/group';
 import { useState, useEffect, useRef } from "react";
-import arrayMean from "ml-array-mean";
+
+import determineBaseCoordinates from "../../utils/OutputGraphForSplitMode/determineBaseCoordinates";
+import { xScale, yScale, xAxisScale, yAxisScale } from "../../utils/OutputGraphForSplitMode/scales"
+import determineBarCoordinates from "../../utils/OutputGraphForSplitMode/determineBarCoordinates";
+import determinePointCoordinates from "../../utils/OutputGraphForSplitMode/determinePointCoordinates";
+
+import detectIfCursorIsWithinGraphingBounds from "../../utils/OutputGraphForSplitMode/event_handlers/detectIfCursorIsWithinGraphingBounds";
+import handleMouseEnter_CIRCLE from "../../utils/OutputGraphForSplitMode/event_handlers/handleMouseEnter_CIRCLE";
+import handleMouseMove_CIRCLE from "../../utils/OutputGraphForSplitMode/event_handlers/handleMouseMove_CIRCLE";
+import handleMouseUp_CIRCLE from "../../utils/OutputGraphForSplitMode/event_handlers/handleMouseUp_CIRCLE";
+import handleMouseDown_CIRCLE from "../../utils/OutputGraphForSplitMode/event_handlers/handleMouseDown_CIRCLE";
+import handleMouseLeave_CIRCLE from "../../utils/OutputGraphForSplitMode/event_handlers/handleMouseLeave_CIRCLE";
+import handleMouseUp_CONTAINER from "../../utils/OutputGraphForSplitMode/event_handlers/handleMouseUp_CONTAINER";
 
 const OutputGraphForSplitMode = ({
                                     computedData,
                                     setComputedData,
-                                    // OutputGraphRender,
-                                    // setOutputGraphRender,
                                     OutputGraphWidth,
                                     OutputGraphHeight, 
                                     slowestPermissibleSplit, 
                                     OutputGraphMargin,
-                                    // isMouseDown,
-                                    // setIsMouseDown
                                 }) => {
 
     const margin = OutputGraphMargin;
@@ -26,69 +34,23 @@ const OutputGraphForSplitMode = ({
     const average_split = computedData.final_average_split;
 
     // Compute XY coordinates for each point (one per division)
-    
-
     let point_coordinates_absolute = [];
     let y_coordinates_absolute = [];
     let x_coordinates_absolute = [];
     let x_axis_domain = [];
-
-    for (let i=0; i <= number_of_divisions; i++) {
-        let x =  (total_distance / number_of_divisions) * (i);
-        let y = average_split;
-
-        x_axis_domain.push(x)
-
-        if (i < number_of_divisions) {
-            point_coordinates_absolute.push([x,y]);
-            y_coordinates_absolute.push(y);
-            x_coordinates_absolute.push(x);
-        }
-    };
-
-    const xScale = scaleLinear({
-        domain: [0, Math.max(...x_coordinates_absolute)], // the categorical labels
-        range: [0, (width)],                            // pixel span horizontally
-        padding: 0.0,                         // space between bars
-    }); // xScale("A") returns the left-pixel coordinate for Bar A
-
-    const yScale = scaleLinear({
-        domain: [0, slowestPermissibleSplit],
-        range: [height, 0], // because in an svg, the top is 0
-        padding: 0.0,
-    });
-
-    const xAxisScale = scaleLinear({
-        domain: [0, Math.max(...x_axis_domain)],
-        range: [0, width],
-        padding: 0.0,
-    });
-
-    const yAxisScale = scaleLinear({
-        domain: [slowestPermissibleSplit, 0],
-        range: [height, 0],
-        padding: 0.0,
-    });
+    determineBaseCoordinates(x_axis_domain, pointCoordinates, y_coordinates_absolute, x_coordinates_absolute);
 
     // Prepare input data for <Bar/>
     const barWidth = (width) / number_of_divisions;
     const barCoordinates = []
-    for (let i = 0; i < number_of_divisions; i++) {
-        let barX = i * ((width) / number_of_divisions);
-        let barY = yScale(y_coordinates_absolute[i]);
-        barCoordinates[i] = {x: barX, y: barY};
-    };
+    determineBarCoordinates(number_of_divisions, width, barCoordinates);
 
     // Prepare input data for <LinearPath/>
     const pointCoordinates = []
     let to_put_into_BarAndCircleHeights = {}
-    for (let i = 0; i < number_of_divisions; i++) {
-        let pointX = (i * ((width) / number_of_divisions)) + (barWidth/2);
-        let pointY = yScale(y_coordinates_absolute[i]);
-        
-        pointCoordinates[i] = {x: pointX, y: pointY};
-        to_put_into_BarAndCircleHeights[i] = pointY;
-    };
+    determinePointCoordinates(number_of_divisions, width, barWidth, pointCoordinates, to_put_into_BarAndCircleHeights);
+
+
     const accessors = {
         xAccessor: (d) => d.x,
         yAccessor: (d) => height - d.y,
@@ -97,128 +59,18 @@ const OutputGraphForSplitMode = ({
     const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights);
     useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData]);
 
+    // Default parameters for cursor dragging behaviour
     const isMouseDown = useRef(false);
     const [cursorStyle, setCursorStyle] = useState("row-resize");
     const pointThatsBeingDraggedByTheUser = useRef(null);
-
     const isMouseDraggingPointOnPlot = useRef(false);
     const mouseY_relative = useRef(null);
+
+    // initializing variables for detectIfCursorIsWithinGraphingBounds
     let mouseIsWithinBounds = false;
     let mousePercentage;
-
-    const detectIfCursorIsWithinGraphingBounds = (event) => {
-        let svg_hitbox = document.getElementById("outputGraph").getBoundingClientRect();
-
-        let mouseY_absolute = event.clientY;
-        mouseY_relative.current = mouseY_absolute - svg_hitbox.top - margin.top;
-
-        const svg_height = height;
-        mousePercentage = mouseY_relative.current / svg_height * 100;
-
-        let mouseIsWithinVerticalBounds = (mouseY_relative.current >= 0) && (mouseY_absolute <= (svg_hitbox.bottom - margin.bottom));
-        mouseIsWithinBounds = mouseIsWithinVerticalBounds // This is here for if you want to implement horizontal bounds in the future
-
-        if (mouseIsWithinBounds && isMouseDraggingPointOnPlot.current) {
-            // while (isMouseDraggingPointOnPlot) {
-                setBarAndCircleHeights({...BarAndCircleHeights, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
-                
-                // UPDATE COMPUTED DATA
-                // const [computedData, setComputedData] = useState({
-                //     final_time: "",
-                //     final_time_display: "",
-                //     final_average_split: "",
-                //     final_average_split_display: "",
-                //     number_of_divisions: "",
-                //     total_distance: "",
-                // });
-                
-                let plotted_circles = document.getElementsByClassName("plotted_circle");
-                let plotted_circles_y_values = [];
-                let circle_height_proportions = [];
-                let plotted_circles_splits = [];
-                let new_final_average_split;
-                let new_final_time;
-
-                console.clear();
-                // Get the height values of every circle in the plot
-                for (let i=0; i<plotted_circles.length; i++) {
-                    plotted_circles_y_values.push(plotted_circles[i].cy.animVal.value);
-                }
-
-                // Convert all the height values into splits
-                for (let i=0; i<plotted_circles_y_values.length; i++) {
-                    circle_height_proportions.push(plotted_circles_y_values[i] / svg_height);
-                }
-                console.log(`%`)
-                console.log(circle_height_proportions)
-
-
-                // THE ISSUE LIES IN THIS FOR LOOP
-                for (let i=0; i<circle_height_proportions.length; i++) {
-                    plotted_circles_splits.push(circle_height_proportions[i] * slowestPermissibleSplit);
-                }
-                console.log(plotted_circles_splits);
-
-                // Compute the average final split from them
-                new_final_average_split = arrayMean(plotted_circles_splits);
-                console.log(`new_final_average_split: ${new_final_average_split}`);
-
-                // Recompute final time from the new average final split
-                new_final_time = new_final_average_split * total_distance / 500;
-                console.log(`new_final_time:${new_final_time}`);
-            // }
-        }
-
-        else if (!mouseIsWithinVerticalBounds) {
-            isMouseDraggingPointOnPlot.current = false;
-            handleMouseUp_CIRCLE();
-        }
-
-        // if (mouseIsWithinBounds) {
-
-        //     console.clear();            
-        //     console.log(`You're hovering at ABS y=${mouseY_absolute}`)
-        //     console.log(`You're hovering at REL y=${mouseY_relative.current}`)
-        //     console.log(`${mousePercentage}%`)
-        //     console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
-        // }
-        // else {
-        //     console.clear();
-        //     console.log(`Cursor is not within graphing bounds.`)
-        //     console.log(`${mousePercentage}%`)
-        // }
-
-    };
-
-    const handleMouseUp_CONTAINER = (event) => {
-        isMouseDraggingPointOnPlot.current = false;
-    };
-
-    const handleMouseMove_CIRCLE = (event) => {
-        pointThatsBeingDraggedByTheUser.current = event.target.id.slice(-1);
-        pointThatsBeingDraggedByTheUser.y = BarAndCircleHeights[pointThatsBeingDraggedByTheUser.current];
-    };
-
-    const handleMouseEnter_CIRCLE = (event) => {
-        console.log(pointThatsBeingDraggedByTheUser)
-    };
-
-    const handleMouseUp_CIRCLE = (event) => {
-        isMouseDown.current = false;
-        setCursorStyle("row-resize");
-        isMouseDraggingPointOnPlot.current = false;
-        pointThatsBeingDraggedByTheUser.current = null;
-    };
-
-    const handleMouseDown_CIRCLE = (event) => {
-        isMouseDown.current = true;
-        setCursorStyle("grab");
-        isMouseDraggingPointOnPlot.current = true;
-    };
-
-    const handleMouseLeave_CIRCLE = (event) => {
-        // isMouseDraggingPointOnPlot.current = false;
-    };
+    let new_final_average_split;
+    let new_final_time;
 
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
