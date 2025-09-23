@@ -26,8 +26,6 @@ const OutputGraphForSplitMode = ({
     const average_split = computedData.final_average_split;
 
     // Compute XY coordinates for each point (one per division)
-    
-
     let point_coordinates_absolute = [];
     let y_coordinates_absolute = [];
     let x_coordinates_absolute = [];
@@ -84,7 +82,7 @@ const OutputGraphForSplitMode = ({
     let to_put_into_BarAndCircleHeights = {}
     for (let i = 0; i < number_of_divisions; i++) {
         let pointX = (i * ((width) / number_of_divisions)) + (barWidth/2);
-        let pointY = yScale(y_coordinates_absolute[i]);
+        let pointY = yAxisScale(y_coordinates_absolute[i]);
         
         pointCoordinates[i] = {x: pointX, y: pointY};
         to_put_into_BarAndCircleHeights[i] = pointY;
@@ -149,8 +147,8 @@ const OutputGraphForSplitMode = ({
                 for (let i=0; i<plotted_circles_y_values.length; i++) {
                     circle_height_proportions.push(plotted_circles_y_values[i] / svg_height);
                 }
-                console.log(`%`)
-                console.log(circle_height_proportions)
+                // console.log(`%`)
+                // console.log(circle_height_proportions)
 
 
                 // THE ISSUE LIES IN THIS FOR LOOP
@@ -200,7 +198,7 @@ const OutputGraphForSplitMode = ({
     };
 
     const handleMouseEnter_CIRCLE = (event) => {
-        console.log(pointThatsBeingDraggedByTheUser)
+        // console.log(pointThatsBeingDraggedByTheUser)
     };
 
     const handleMouseUp_CIRCLE = (event) => {
@@ -219,6 +217,8 @@ const OutputGraphForSplitMode = ({
     const handleMouseLeave_CIRCLE = (event) => {
         // isMouseDraggingPointOnPlot.current = false;
     };
+
+    console.log(computedData.final_average_split);
 
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
