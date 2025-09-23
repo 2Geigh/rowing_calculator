@@ -1,12 +1,8 @@
-const determinePointCoordinates = (
-                                    number_of_divisions,
+const determinePointCoordinates = (number_of_divisions,
                                     width,
                                     barWidth,
-                                    yScale,
-                                    y_coordinates_absolute,
                                     pointCoordinates,
-                                    to_put_into_BarAndCircleHeights
-                                ) => {
+                                    to_put_into_BarAndCircleHeights) => {
 
     for (let i = 0; i < number_of_divisions; i++) {
         let pointX = (i * ((width) / number_of_divisions)) + (barWidth/2);

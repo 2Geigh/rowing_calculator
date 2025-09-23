@@ -1,4 +1,4 @@
-const determineBaseCoordinates = (x_axis_domain, point_coordinates_absolute, y_coordinates_absolute, x_coordinates_absolute) => {
+const determineBaseCoordinates = (x_axis_domain, pointCoordinates, y_coordinates_absolute, x_coordinates_absolute) => {
     
     for (let i=0; i <= number_of_divisions; i++) {
 
