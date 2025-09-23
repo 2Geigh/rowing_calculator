@@ -5,6 +5,8 @@ import { Group } from '@visx/group';
 import { useState, useEffect, useRef } from "react";
 import arrayMean from "ml-array-mean";
 
+import formatTime from "../../utils/timeFormat";
+
 const OutputGraphForSplitMode = ({
                                     computedData,
                                     setComputedData,
@@ -104,7 +106,9 @@ const OutputGraphForSplitMode = ({
     let mouseIsWithinBounds = false;
     let mousePercentage;
 
-    const detectIfCursorIsWithinGraphingBounds = (event) => {
+    const computedData_REF = useRef({computedData});
+
+    const detectIfCursorIsWithinGraphingBounds = async (event) => {
         let svg_hitbox = document.getElementById("outputGraph").getBoundingClientRect();
 
         let mouseY_absolute = event.clientY;
@@ -147,11 +151,7 @@ const OutputGraphForSplitMode = ({
                 for (let i=0; i<plotted_circles_y_values.length; i++) {
                     circle_height_proportions.push(plotted_circles_y_values[i] / svg_height);
                 }
-                // console.log(`%`)
-                // console.log(circle_height_proportions)
 
-
-                // THE ISSUE LIES IN THIS FOR LOOP
                 for (let i=0; i<circle_height_proportions.length; i++) {
                     plotted_circles_splits.push(circle_height_proportions[i] * slowestPermissibleSplit);
                 }
@@ -164,6 +164,14 @@ const OutputGraphForSplitMode = ({
                 // Recompute final time from the new average final split
                 new_final_time = new_final_average_split * total_distance / 500;
                 console.log(`new_final_time:${new_final_time}`);
+
+                //Update data state
+                computedData_REF.current = {...computedData,
+                    final_time: new_final_time,
+                    final_time_display: formatTime(new_final_time)[1],
+                    final_average_split: new_final_average_split,
+                    final_average_split_display: formatTime(new_final_average_split)[1],
+                };
             // }
         }
 
@@ -190,6 +198,7 @@ const OutputGraphForSplitMode = ({
 
     const handleMouseUp_CONTAINER = (event) => {
         isMouseDraggingPointOnPlot.current = false;
+        setComputedData(computedData_REF.current)
     };
 
     const handleMouseMove_CIRCLE = (event) => {
@@ -218,7 +227,8 @@ const OutputGraphForSplitMode = ({
         // isMouseDraggingPointOnPlot.current = false;
     };
 
-    console.log(computedData.final_average_split);
+    console.clear()
+    console.log(computedData_REF.current);
 
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
