@@ -32,12 +32,28 @@ const OutputGraphForSplitMode = ({
     const total_distance = computedData.total_distance;
     const average_split = computedData.final_average_split;
 
+    const accessors = {
+        xAccessor: (d) => d.x,
+        yAccessor: (d) => height - d.y,
+    };
+
+    const isMouseDown = useRef(false);
+    const [cursorStyle, setCursorStyle] = useState("row-resize");
+    const pointThatsBeingDraggedByTheUser = useRef(null);
+    const isMouseDraggingPointOnPlot = useRef(false);
+    const mouseY_relative = useRef(null);
+    let mouseIsWithinBounds = false;
+    let mousePercentage;
+
+    const computedData_REF = useRef({computedData});
+
+
+
+
     // Compute XY coordinates for each point (one per division)
     let y_coordinates_absolute = [];
     let x_coordinates_absolute = [];
     let x_axis_domain = [];
-
-
     for (let i=0; i <= number_of_divisions; i++) {
         let x =  (total_distance / number_of_divisions) * (i);
         let y;
@@ -83,6 +99,9 @@ const OutputGraphForSplitMode = ({
         padding: 0.0,
     });
 
+
+
+
     // Prepare input data for <Bar/>
     const barWidth = (width) / number_of_divisions;
     const barCoordinates = []
@@ -99,10 +118,12 @@ const OutputGraphForSplitMode = ({
         barCoordinates[i] = {x: barX, y: barY};
     };
 
+
+
+
     // Prepare input data for <LinearPath/> and <Circle/>
     const pointCoordinates = []
     let to_put_into_BarAndCircleHeights = {}
-
     for (let i = 0; i < number_of_divisions; i++) {
         let pointX = (i * ((width) / number_of_divisions)) + (barWidth/2);
         let pointY;
@@ -116,25 +137,15 @@ const OutputGraphForSplitMode = ({
         pointCoordinates[i] = {x: pointX, y: pointY};
         to_put_into_BarAndCircleHeights[i] = pointY;
     };
-    const accessors = {
-        xAccessor: (d) => d.x,
-        yAccessor: (d) => height - d.y,
-    };
+    
     
     const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights);
     useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData]);
 
-    const isMouseDown = useRef(false);
-    const [cursorStyle, setCursorStyle] = useState("row-resize");
-    const pointThatsBeingDraggedByTheUser = useRef(null);
 
-    const isMouseDraggingPointOnPlot = useRef(false);
-    const mouseY_relative = useRef(null);
-    let mouseIsWithinBounds = false;
 
-    const computedData_REF = useRef({computedData});
-    let mousePercentage;
 
+    // EVENT HANDLERS
     const detectIfCursorIsWithinGraphingBounds = async (event) => {
         let svg_hitbox = document.getElementById("outputGraph").getBoundingClientRect();
 
@@ -258,10 +269,10 @@ const OutputGraphForSplitMode = ({
         // isMouseDraggingPointOnPlot.current = false;
     };
 
-    console.log(computedData);
-    console.log(computedData_REF.current);
-    console.log(haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current);
-    console.log(point_y_values_REF.current);
+    // console.log(computedData);
+    // console.log(computedData_REF.current);
+    // console.log(haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current);
+    // console.log(point_y_values_REF.current);
 
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
