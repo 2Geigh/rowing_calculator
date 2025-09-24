@@ -150,7 +150,13 @@ const OutputGraphForSplitMode = ({
         if (mouseIsWithinBounds && isMouseDraggingPointOnPlot.current) {
             // while (isMouseDraggingPointOnPlot) {
                 setBarAndCircleHeights({...BarAndCircleHeights, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
-                point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = pointThatsBeingDraggedByTheUser.y;
+
+                if (pointThatsBeingDraggedByTheUser.y > slowestPermissibleSplit) {
+                    point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = slowestPermissibleSplit;
+                } else {
+                    point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = pointThatsBeingDraggedByTheUser.y;
+                }
+
                 haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current = true;
                 
                 // UPDATE COMPUTED DATA
@@ -209,6 +215,11 @@ const OutputGraphForSplitMode = ({
         }
     };
 
+    const handleMouseleave_CONTAINER = (event) => {
+        isMouseDraggingPointOnPlot.current = false;
+        handleMouseUp_CIRCLE();
+    };
+
     const handleMouseUp_CONTAINER = (event) => {
 
         if (isMouseDraggingPointOnPlot) {
@@ -255,7 +266,7 @@ const OutputGraphForSplitMode = ({
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
 
-            <div id="graphAndXAxisLabel" className="block center bg-pink-300" onMouseMove={detectIfCursorIsWithinGraphingBounds} onMouseUp={handleMouseUp_CONTAINER}>
+            <div id="graphAndXAxisLabel" className="block center bg-pink-300" onMouseMove={detectIfCursorIsWithinGraphingBounds} onMouseUp={handleMouseUp_CONTAINER} onMouseLeave={handleMouseleave_CONTAINER}>
                 <svg
                     width={OutputGraphWidth - margin.right}
                     height={OutputGraphHeight + margin.bottom}
@@ -339,7 +350,7 @@ const OutputGraphForSplitMode = ({
                                         key={`point_${i}`}
                                         cx={p.x}
                                         cy={BarAndCircleHeights[i]}
-                                        r={20}
+                                        r={5}
                                         fill="orange"
                                         onMouseMove={handleMouseMove_CIRCLE}
                                         onMouseDown={handleMouseDown_CIRCLE}
