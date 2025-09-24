@@ -20,6 +20,11 @@ const OutputGraphForSplitMode = ({
                                     // setIsMouseDown
                                 }) => {
 
+    // console.clear();
+
+    const haveThePointsOnTheGraphBeenManipulatedByTheUserYet = useRef(false);
+    const point_y_values_REF = useRef({});
+
     const margin = OutputGraphMargin;
     const width = OutputGraphWidth / (1.5);
     const height = OutputGraphHeight - margin.top;
@@ -28,19 +33,27 @@ const OutputGraphForSplitMode = ({
     const average_split = computedData.final_average_split;
 
     // Compute XY coordinates for each point (one per division)
-    let point_coordinates_absolute = [];
     let y_coordinates_absolute = [];
     let x_coordinates_absolute = [];
     let x_axis_domain = [];
 
+
     for (let i=0; i <= number_of_divisions; i++) {
         let x =  (total_distance / number_of_divisions) * (i);
-        let y = average_split;
+        let y;
+
+        if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
+            y = point_y_values_REF.current[i];
+        }
+
+        else {
+            y = average_split;
+        }
 
         x_axis_domain.push(x)
-
+        
         if (i < number_of_divisions) {
-            point_coordinates_absolute.push([x,y]);
+            point_y_values_REF.current = {...point_y_values_REF.current, [i]:y};
             y_coordinates_absolute.push(y);
             x_coordinates_absolute.push(x);
         }
@@ -75,16 +88,30 @@ const OutputGraphForSplitMode = ({
     const barCoordinates = []
     for (let i = 0; i < number_of_divisions; i++) {
         let barX = i * ((width) / number_of_divisions);
-        let barY = yScale(y_coordinates_absolute[i]);
+        let barY;
+
+        if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
+            barY = yScale(point_y_values_REF.current[i]);
+        } else {
+            barY = yScale(y_coordinates_absolute[i]);;
+        }
+
         barCoordinates[i] = {x: barX, y: barY};
     };
 
-    // Prepare input data for <LinearPath/>
+    // Prepare input data for <LinearPath/> and <Circle/>
     const pointCoordinates = []
     let to_put_into_BarAndCircleHeights = {}
+
     for (let i = 0; i < number_of_divisions; i++) {
         let pointX = (i * ((width) / number_of_divisions)) + (barWidth/2);
-        let pointY = yAxisScale(y_coordinates_absolute[i]);
+        let pointY;
+
+        if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
+            pointY = yAxisScale(point_y_values_REF.current[i]);
+        } else {
+            pointY = yAxisScale(y_coordinates_absolute[i]);
+        }
         
         pointCoordinates[i] = {x: pointX, y: pointY};
         to_put_into_BarAndCircleHeights[i] = pointY;
@@ -123,6 +150,7 @@ const OutputGraphForSplitMode = ({
         if (mouseIsWithinBounds && isMouseDraggingPointOnPlot.current) {
             // while (isMouseDraggingPointOnPlot) {
                 setBarAndCircleHeights({...BarAndCircleHeights, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
+                point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = pointThatsBeingDraggedByTheUser.y;
                 
                 // UPDATE COMPUTED DATA
                 // const [computedData, setComputedData] = useState({
@@ -141,7 +169,6 @@ const OutputGraphForSplitMode = ({
                 let new_final_average_split;
                 let new_final_time;
 
-                console.clear();
                 // Get the height values of every circle in the plot
                 for (let i=0; i<plotted_circles.length; i++) {
                     plotted_circles_y_values.push(plotted_circles[i].cy.animVal.value);
@@ -197,8 +224,14 @@ const OutputGraphForSplitMode = ({
     };
 
     const handleMouseUp_CONTAINER = (event) => {
+
+        if (isMouseDraggingPointOnPlot) {
+            haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current = true;
+        }
+
         isMouseDraggingPointOnPlot.current = false;
         setComputedData(computedData_REF.current)
+        
     };
 
     const handleMouseMove_CIRCLE = (event) => {
@@ -215,6 +248,7 @@ const OutputGraphForSplitMode = ({
         setCursorStyle("row-resize");
         isMouseDraggingPointOnPlot.current = false;
         pointThatsBeingDraggedByTheUser.current = null;
+
     };
 
     const handleMouseDown_CIRCLE = (event) => {
@@ -227,8 +261,11 @@ const OutputGraphForSplitMode = ({
         // isMouseDraggingPointOnPlot.current = false;
     };
 
-    console.clear()
+    // console.clear()
+    console.log(`haveThePointsOnTheGraphBeenManipulatedByTheUserYet: ${haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current}`);
+    console.log(computedData);
     console.log(computedData_REF.current);
+    console.log(point_y_values_REF.current);
 
     return(
         <div id="outputGraph" className="flex flex-row items-start justify-start bg-pink-200">
