@@ -20,7 +20,7 @@ const OutputGraphForSplitMode = ({
                                     // setIsMouseDown
                                 }) => {
 
-    // console.clear();
+    console.clear();
 
     const haveThePointsOnTheGraphBeenManipulatedByTheUserYet = useRef(false);
     const point_y_values_REF = useRef({});
@@ -131,9 +131,9 @@ const OutputGraphForSplitMode = ({
     const isMouseDraggingPointOnPlot = useRef(false);
     const mouseY_relative = useRef(null);
     let mouseIsWithinBounds = false;
-    let mousePercentage;
 
     const computedData_REF = useRef({computedData});
+    let mousePercentage;
 
     const detectIfCursorIsWithinGraphingBounds = async (event) => {
         let svg_hitbox = document.getElementById("outputGraph").getBoundingClientRect();
@@ -151,6 +151,7 @@ const OutputGraphForSplitMode = ({
             // while (isMouseDraggingPointOnPlot) {
                 setBarAndCircleHeights({...BarAndCircleHeights, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
                 point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = pointThatsBeingDraggedByTheUser.y;
+                haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current = true;
                 
                 // UPDATE COMPUTED DATA
                 // const [computedData, setComputedData] = useState({
@@ -206,21 +207,6 @@ const OutputGraphForSplitMode = ({
             isMouseDraggingPointOnPlot.current = false;
             handleMouseUp_CIRCLE();
         }
-
-        // if (mouseIsWithinBounds) {
-
-        //     console.clear();            
-        //     console.log(`You're hovering at ABS y=${mouseY_absolute}`)
-        //     console.log(`You're hovering at REL y=${mouseY_relative.current}`)
-        //     console.log(`${mousePercentage}%`)
-        //     console.log(`mouseIsWithinBounds: ${mouseIsWithinBounds}`)
-        // }
-        // else {
-        //     console.clear();
-        //     console.log(`Cursor is not within graphing bounds.`)
-        //     console.log(`${mousePercentage}%`)
-        // }
-
     };
 
     const handleMouseUp_CONTAINER = (event) => {
@@ -261,10 +247,9 @@ const OutputGraphForSplitMode = ({
         // isMouseDraggingPointOnPlot.current = false;
     };
 
-    // console.clear()
-    console.log(`haveThePointsOnTheGraphBeenManipulatedByTheUserYet: ${haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current}`);
     console.log(computedData);
     console.log(computedData_REF.current);
+    console.log(haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current);
     console.log(point_y_values_REF.current);
 
     return(
