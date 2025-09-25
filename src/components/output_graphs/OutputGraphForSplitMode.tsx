@@ -5,7 +5,7 @@ import { Group } from '@visx/group';
 import { useState, useEffect, useRef } from "react";
 import arrayMean from "ml-array-mean";
 
-import formatTime from "../../utils/timeFormat";
+import formatTime from "../../utils/timeFormat.js";
 
 const OutputGraphForSplitMode = ({
                                     computedData,

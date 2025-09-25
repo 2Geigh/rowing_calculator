@@ -7,11 +7,12 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores(['dist']),
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{ts,tsx,js,jsx}'],
     extends: [
       js.configs.recommended,
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
+      'plugin:@typescript-eslint/recommended',
     ],
     languageOptions: {
       ecmaVersion: 2020,
@@ -20,6 +21,8 @@ export default defineConfig([
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
         sourceType: 'module',
+        // Specify the TypeScript parser
+        parser: '@typescript-eslint/parser',
       },
     },
     rules: {

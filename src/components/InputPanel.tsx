@@ -1,6 +1,6 @@
-import InputField from './InputField';
-import formatTime from '../utils/timeFormat'
-import trimLeadingZeroes from '../utils/validation';
+import InputField from './InputField.js';
+import formatTime from '../utils/timeFormat.js'
+import trimLeadingZeroes from '../utils/validation.js';
 
 const InputPanel = ( {
                         dataToCompute,

@@ -1,4 +1,4 @@
-import OutputGraphForSplitMode from "./output_graphs/OutputGraphForSplitMode";
+import OutputGraphForSplitMode from "./output_graphs/OutputGraphForSplitMode.js";
 import { useState } from "react";
 
 const OutputPanel = ( {

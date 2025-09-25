@@ -1,5 +1,5 @@
-import InputPanel from './components/InputPanel.jsx';
-import OutputPanel from './components/OutputPanel';
+import InputPanel from './components/InputPanel.js';
+import OutputPanel from './components/OutputPanel.js';
 import { useState } from 'react';
 import './App.css';
 
