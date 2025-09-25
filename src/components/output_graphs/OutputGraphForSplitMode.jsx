@@ -51,96 +51,157 @@ const OutputGraphForSplitMode = ({
 
 
     // Compute XY coordinates for each point (one per division)
-    let y_coordinates_absolute = [];
-    let x_coordinates_absolute = [];
-    let x_axis_domain = [];
-    for (let i=0; i <= number_of_divisions; i++) {
-        let x =  (total_distance / number_of_divisions) * (i);
-        let y;
-
-        if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
-            y = point_y_values_REF.current[i];
-        }
-
-        else {
-            y = average_split;
-        }
-
-        x_axis_domain.push(x)
+    const compute_point_coordinates_SI_UNITS = (  number_of_divisions,
+                                                total_distance,
+                                                haveThePointsOnTheGraphBeenManipulatedByTheUserYet,
+                                                point_y_values_REF) => {
         
-        if (i < number_of_divisions) {
-            point_y_values_REF.current = {...point_y_values_REF.current, [i]:y};
-            y_coordinates_absolute.push(y);
-            x_coordinates_absolute.push(x);
-        }
-    };
+        let point_coordinates_SI_UNITS = {};
+        for (let i=0; i <= number_of_divisions; i++) {
+            let x =  (total_distance / number_of_divisions) * (i);
+            let y;
 
-    const xScale = scaleLinear({
-        domain: [0, Math.max(...x_coordinates_absolute)], // the categorical labels
+            if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
+                y = point_y_values_REF.current[i];
+            }
+
+            else {
+                y = average_split;
+            }
+
+            // x_axis_domain.push(x)
+            
+            if (i < number_of_divisions) {
+                point_y_values_REF.current = {...point_y_values_REF.current, [i]:y};
+                // y_coordinates_pixels.push(y);
+                // x_coordinates_pixels.push(x);
+                point_coordinates_SI_UNITS[i] = {'x': x, 'y': y}
+            }
+        };
+
+        return point_coordinates_SI_UNITS;
+    }
+
+    const compute_point_x_coordinates_SI_UNITS = (number_of_divisions,
+                                                total_distance) => {
+        
+        let point_x_coordinates_SI_UNITS = {};
+        for (let i=0; i <= number_of_divisions; i++) {
+            let x =  (total_distance / number_of_divisions) * (i);
+
+            if (i < number_of_divisions) {
+                point_x_coordinates_SI_UNITS[i] = x;
+            }
+        };
+
+        return point_x_coordinates_SI_UNITS;
+    }
+
+    const compute_point_y_coordinates_SI_UNITS = (  number_of_divisions,
+                                                    haveThePointsOnTheGraphBeenManipulatedByTheUserYet,
+                                                    point_y_values_REF) => {
+        
+        let point_y_coordinates_SI_UNITS = {};
+        for (let i=0; i <= number_of_divisions; i++) {
+            let y;
+
+            if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
+                y = point_y_values_REF.current[i];
+            }
+
+            else {
+                y = average_split;
+            }
+
+            if (i < number_of_divisions) {
+                point_y_values_REF.current = {...point_y_values_REF.current, [i]:y};
+                point_y_coordinates_SI_UNITS[i] = y;
+            }
+        };
+
+        return point_y_coordinates_SI_UNITS;
+    }
+
+    const compute_x_axis_domain_SI_UNITS = ( number_of_divisions,
+                                    total_distance ) => {
+        
+        let x_axis_domain = [];
+        for (let i=0; i <= number_of_divisions; i++) {
+            let x =  (total_distance / number_of_divisions) * (i);
+            x_axis_domain.push(x)  
+        };
+
+        return x_axis_domain;
+    }
+
+    let point_coordinates_SI_UNITS = compute_point_coordinates_SI_UNITS(number_of_divisions, total_distance, haveThePointsOnTheGraphBeenManipulatedByTheUserYet, point_y_values_REF);
+    let point_x_coordinates_SI_UNITS = compute_point_x_coordinates_SI_UNITS(number_of_divisions, total_distance);
+    let point_y_coordinates_SI_UNITS = compute_point_y_coordinates_SI_UNITS(number_of_divisions, haveThePointsOnTheGraphBeenManipulatedByTheUserYet, point_y_values_REF);
+    let x_axis_domain_SI_UNITS = compute_x_axis_domain_SI_UNITS(number_of_divisions, total_distance);
+
+    const xScale_PIXELS = scaleLinear({
+        domain: [0, Math.max(...Object.values(point_x_coordinates_SI_UNITS))], // the categorical labels
         range: [0, (width)],                            // pixel span horizontally
         padding: 0.0,                         // space between bars
     }); // xScale("A") returns the left-pixel coordinate for Bar A
 
-    const yScale = scaleLinear({
+    const yScale_PIXELS = scaleLinear({
         domain: [0, slowestPermissibleSplit],
         range: [height, 0], // because in an svg, the top is 0
         padding: 0.0,
     });
 
-    const xAxisScale = scaleLinear({
-        domain: [0, Math.max(...x_axis_domain)],
+    const xAxisScale_PIXELS = scaleLinear({
+        domain: [0, Math.max(...x_axis_domain_SI_UNITS)],
         range: [0, width],
         padding: 0.0,
     });
 
-    const yAxisScale = scaleLinear({
+    const yAxisScale_PIXELS = scaleLinear({
         domain: [slowestPermissibleSplit, 0],
         range: [height, 0],
         padding: 0.0,
     });
 
-
-
-
     // Prepare input data for <Bar/>
-    const barWidth = (width) / number_of_divisions;
-    const barCoordinates = []
+    const barWidth_PIXELS = (width) / number_of_divisions;
+    const bar_coordinates_PIXELS = []
     for (let i = 0; i < number_of_divisions; i++) {
         let barX = i * ((width) / number_of_divisions);
         let barY;
 
         if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
-            barY = yScale(point_y_values_REF.current[i]);
+            barY = yScale_PIXELS(point_y_values_REF.current[i]);
         } else {
-            barY = yScale(y_coordinates_absolute[i]);;
+            barY = yScale_PIXELS(point_y_coordinates_SI_UNITS[i]);;
         }
 
-        barCoordinates[i] = {x: barX, y: barY};
+        bar_coordinates_PIXELS[i] = {x: barX, y: barY};
     };
 
 
 
 
     // Prepare input data for <LinearPath/> and <Circle/>
-    const pointCoordinates = []
-    let to_put_into_BarAndCircleHeights = {}
+    const pointCoordinates_PIXELS = []
+    let to_put_into_BarAndCircleHeights_PIXELS = {}
     for (let i = 0; i < number_of_divisions; i++) {
-        let pointX = (i * ((width) / number_of_divisions)) + (barWidth/2);
+        let pointX = (i * ((width) / number_of_divisions)) + (barWidth_PIXELS/2);
         let pointY;
 
         if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
-            pointY = yAxisScale(point_y_values_REF.current[i]);
+            pointY = yAxisScale_PIXELS(point_y_values_REF.current[i]);
         } else {
-            pointY = yAxisScale(y_coordinates_absolute[i]);
+            pointY = yAxisScale_PIXELS(point_y_coordinates_SI_UNITS[i]);
         }
         
-        pointCoordinates[i] = {x: pointX, y: pointY};
-        to_put_into_BarAndCircleHeights[i] = pointY;
+        pointCoordinates_PIXELS[i] = {x: pointX, y: pointY};
+        to_put_into_BarAndCircleHeights_PIXELS[i] = pointY;
     };
     
     
-    const [BarAndCircleHeights, setBarAndCircleHeights] = useState(to_put_into_BarAndCircleHeights);
-    useEffect(() => { setBarAndCircleHeights(to_put_into_BarAndCircleHeights) }, [computedData]);
+    const [BarAndCircleHeights_PIXELS, setBarAndCircleHeights_PIXELS] = useState(to_put_into_BarAndCircleHeights_PIXELS);
+    useEffect(() => { setBarAndCircleHeights_PIXELS(to_put_into_BarAndCircleHeights_PIXELS) }, [computedData]);
 
 
 
@@ -160,7 +221,7 @@ const OutputGraphForSplitMode = ({
 
         if (mouseIsWithinBounds && isMouseDraggingPointOnPlot.current) {
             // while (isMouseDraggingPointOnPlot) {
-                setBarAndCircleHeights({...BarAndCircleHeights, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
+                setBarAndCircleHeights_PIXELS({...BarAndCircleHeights_PIXELS, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
 
                 if (pointThatsBeingDraggedByTheUser.y > slowestPermissibleSplit) {
                     point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = slowestPermissibleSplit;
@@ -244,7 +305,7 @@ const OutputGraphForSplitMode = ({
 
     const handleMouseMove_CIRCLE = (event) => {
         pointThatsBeingDraggedByTheUser.current = event.target.id.slice(-1);
-        pointThatsBeingDraggedByTheUser.y = BarAndCircleHeights[pointThatsBeingDraggedByTheUser.current];
+        pointThatsBeingDraggedByTheUser.y = BarAndCircleHeights_PIXELS[pointThatsBeingDraggedByTheUser.current];
     };
 
     const handleMouseEnter_CIRCLE = (event) => {
@@ -290,7 +351,7 @@ const OutputGraphForSplitMode = ({
                                 
                                 {/* Y-Axis with Units */}
                                 <Axis
-                                scale={yAxisScale}
+                                scale={yAxisScale_PIXELS}
                                 left={0}
                                 stroke="black"
                                 tickStroke="black"
@@ -308,7 +369,7 @@ const OutputGraphForSplitMode = ({
 
                                 {/* X-Axis with Units */}
                                 <Axis
-                                scale={xAxisScale}
+                                scale={xAxisScale_PIXELS}
                                 top={height}
                                 left={0}
                                 // stroke="black"
@@ -325,17 +386,17 @@ const OutputGraphForSplitMode = ({
                                 />
 
                                 {/* BARS */}
-                                {barCoordinates.map((p,i) => {
-                                const barHeight = /*p.y*/height - BarAndCircleHeights[i];
+                                {bar_coordinates_PIXELS.map((p,i) => {
+                                const barHeight = /*p.y*/height - BarAndCircleHeights_PIXELS[i];
                                 const barX = p.x;
-                                const barY = BarAndCircleHeights[i];
+                                const barY = BarAndCircleHeights_PIXELS[i];
 
                                 return (
                                     <Bar
                                     key={p.x}
                                     x={barX}
                                     y={barY}
-                                    width={barWidth}
+                                    width={barWidth_PIXELS}
                                     height={barHeight}
                                     fill="steelblue"
                                     stroke="red"
@@ -354,13 +415,13 @@ const OutputGraphForSplitMode = ({
                                 /> */}
 
                                 {/* CIRCLES */}
-                                {pointCoordinates.map((p, i) => (
+                                {pointCoordinates_PIXELS.map((p, i) => (
                                     <Circle
                                         id={`point_${i}`}
                                         className="plotted_circle"
                                         key={`point_${i}`}
                                         cx={p.x}
-                                        cy={BarAndCircleHeights[i]}
+                                        cy={BarAndCircleHeights_PIXELS[i]}
                                         r={5}
                                         fill="orange"
                                         onMouseMove={handleMouseMove_CIRCLE}

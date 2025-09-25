@@ -20,7 +20,7 @@ const OutputPanel = ( {
                                         left: (OutputGraphWidth_DEFAULT * 0.13)}
 
     const [OutputGraphWidth, setOutputGraphWidth] = useState(500); // Default test value: 500;
-    const [OutputGraphHeight, setOutputGraphheight] = useState(500); // Default test value: 200;
+    const [OutputGraphHeight, setOutputGraphheight] = useState(200); // Default test value: 200;
     const [OutputGraphMargin, setOutputGraphMargin] = useState({
                                                                 top: ((0.0292 * OutputGraphHeight) + 28.9),
                                                                 right: ((0.296 * OutputGraphWidth) - 74.6),
