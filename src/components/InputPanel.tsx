@@ -43,7 +43,8 @@ const InputPanel = ( {
         const PIECE_DISTANCE = Number(dataToCompute.piece_distance);
         const GOAL_HOURS = Number(dataToCompute.goal_hours);
         const GOAL_MINUTES = Number(dataToCompute.goal_minutes);
-        const GOAL_SECONDS = Number(dataToCompute.goal_seconds)
+        const GOAL_SECONDS = Number(dataToCompute.goal_seconds);
+        const NUMBER_OF_DIVISIONS = Number(dataToCompute.number_of_divisions);
 
         // Compute final time
         let final_time = (Math.abs(GOAL_HOURS * 3600)) + (Math.abs(GOAL_MINUTES * 60)) + (Math.abs(GOAL_SECONDS));
@@ -64,9 +65,6 @@ const InputPanel = ( {
 
         let final_average_split_display = formatTime(final_average_split)[1];
 
-        let number_of_divisions = dataToCompute.number_of_divisions;
-        let total_distance = dataToCompute.piece_distance;
-
         // await is redundant here because despite being asynchronous, React releases control of the code immediately after the setState call before its done
         // And because state updaters don't return promises, we can't use .then() either
         // Left as a learning lesson for the reader
@@ -76,8 +74,8 @@ const InputPanel = ( {
                     final_time_display: final_time_display,
                     final_average_split: final_average_split,
                     final_average_split_display: final_average_split_display,
-                    number_of_divisions: number_of_divisions,
-                    total_distance: total_distance,
+                    number_of_divisions: NUMBER_OF_DIVISIONS,
+                    total_distance: PIECE_DISTANCE,
                 }
         )
 
@@ -109,7 +107,7 @@ const InputPanel = ( {
                 name="piece_distance"
                 type="number"
                 placeholder={2000}
-                value={dataToCompute.piece_distance}
+                value={Number(dataToCompute.piece_distance)}
                 onChange={handleChange}
             />
 
@@ -119,7 +117,7 @@ const InputPanel = ( {
                 name="number_of_divisions"
                 type="number"
                 placeholder={4}
-                value={dataToCompute.number_of_divisions}
+                value={Number(dataToCompute.number_of_divisions)}
                 onChange={handleChange}
             />
 
@@ -129,7 +127,7 @@ const InputPanel = ( {
                 name="goal_hours"
                 type="number"
                 placeholder={0}
-                value={dataToCompute.goal_hours}
+                value={Number(dataToCompute.goal_hours)}
                 onChange={handleChange}
             />
 
@@ -139,7 +137,7 @@ const InputPanel = ( {
                 name="goal_minutes"
                 type="number"
                 placeholder={6}
-                value={dataToCompute.goal_minutes}
+                value={Number(dataToCompute.goal_minutes)}
                 onChange={handleChange}
             />
 
@@ -149,7 +147,7 @@ const InputPanel = ( {
                 name="goal_seconds"
                 type="number"
                 placeholder={34}
-                value={dataToCompute.goal_seconds}
+                value={Number(dataToCompute.goal_seconds)}
                 onChange={handleChange}
             />
 
