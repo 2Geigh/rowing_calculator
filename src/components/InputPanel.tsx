@@ -2,6 +2,20 @@ import InputField from './InputField.js';
 import formatTime from '../utils/timeFormat.js'
 import trimLeadingZeroes from '../utils/validation.js';
 
+import type { InputData, OutputData } from '../App.js';
+
+type Props = {
+    dataToCompute: InputData,
+    setDataToCompute: InputData,
+
+    computedData: OutputData,
+    setComputedData: OutputData,
+
+    setHasInputsBeenSubmitted: boolean,
+
+    slowestPermissibleSplit: number
+};
+
 const InputPanel = ( {
                         dataToCompute,
                         setDataToCompute,
@@ -9,7 +23,7 @@ const InputPanel = ( {
                         setComputedData,
                         setHasInputsBeenSubmitted,
                         slowestPermissibleSplit
-                    } ) => {
+                    } : Props ) => {
 
     const handleChange = (e) => {
         // e is the event

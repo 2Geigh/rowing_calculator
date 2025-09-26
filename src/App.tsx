@@ -16,24 +16,25 @@ console.log('Hi mom');
 
 // Function for computing the outputs
 
+
+export type InputData = {
+    piece_distance: number | string,
+    number_of_divisions: number | string,
+    goal_hours: number | string,
+    goal_minutes: number | string,
+    goal_seconds: number | string,
+}
+
+export type OutputData = {
+    final_time: number,
+    final_time_display: string,
+    final_average_split: number,
+    final_average_split_display: string,
+    number_of_divisions: number,
+    total_distance: number
+}
+
 const App: FC = () => {
-
-    type InputData = {
-        piece_distance: number | string,
-        number_of_divisions: number | string,
-        goal_hours: number | string,
-        goal_minutes: number | string,
-        goal_seconds: number | string,
-    }
-
-    type OutputData = {
-        final_time: number,
-        final_time_display: string,
-        final_average_split: number,
-        final_average_split_display: string,
-        number_of_divisions: number,
-        total_distance: number
-    }
     
 
     const [dataToCompute, setDataToCompute] = useState<InputData>({
