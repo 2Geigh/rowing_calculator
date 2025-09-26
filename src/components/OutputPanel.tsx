@@ -1,27 +1,43 @@
 import OutputGraphForSplitMode from "./output_graphs/OutputGraphForSplitMode.js";
-import { useState } from "react";
+import { useState, type FC } from "react";
 
-const OutputPanel = ( {
+import type { OutputData } from "../App.js";
+
+type Props = {
+    computedData: OutputData,
+    setComputedData: Function,
+    hasInputsBeenSubmitted: boolean,
+    slowestPermissibleSplit: number
+}
+
+export type Margin = {
+    top: number,
+    right: number,
+    bottom: number,
+    left: number
+}
+
+const OutputPanel: FC = ( {
                         computedData,
                         setComputedData,
                         hasInputsBeenSubmitted, 
                         slowestPermissibleSplit,
                         // isMouseDown,
                         // setIsMouseDown
-                    } ) => {
+                    } : Props) => {
 
-    const [OutputGraphRender, setOutputGraphRender] = useState(0);
+    const [OutputGraphRender, setOutputGraphRender] = useState<number>(0);
 
-    const OutputGraphWidth_DEFAULT = 500;
-    const OutputGraphHeight_DEFAULT = 100;
-    const OutputGraphMargin_DEFAULT = { top: (OutputGraphHeight_DEFAULT * 0.1),
-                                        right: (OutputGraphWidth_DEFAULT * 0.04),
-                                        bottom: (OutputGraphHeight_DEFAULT * 0.1),
-                                        left: (OutputGraphWidth_DEFAULT * 0.13)}
+    const OUTPUT_GRAPH_WIDTH_PIXELS_DEFAULT = 500;
+    const OUTPUT_GRAPH_HEIGHT_PIXELS_DEFAULT = 100;
+    const OUTPUT_GRAPH_MARGINS_PIXELS_DEFAULT = { top: (OUTPUT_GRAPH_HEIGHT_PIXELS_DEFAULT * 0.1),
+                                        right: (OUTPUT_GRAPH_WIDTH_PIXELS_DEFAULT * 0.04),
+                                        bottom: (OUTPUT_GRAPH_HEIGHT_PIXELS_DEFAULT * 0.1),
+                                        left: (OUTPUT_GRAPH_WIDTH_PIXELS_DEFAULT * 0.13)}
 
-    const [OutputGraphWidth, setOutputGraphWidth] = useState(500); // Default test value: 500;
-    const [OutputGraphHeight, setOutputGraphheight] = useState(200); // Default test value: 200;
-    const [OutputGraphMargin, setOutputGraphMargin] = useState({
+    const [OutputGraphWidth, setOutputGraphWidth] = useState<number>(500); // Default test value: 500;
+    const [OutputGraphHeight, setOutputGraphheight] = useState<number>(200); // Default test value: 200;
+    const [OutputGraphMargin, setOutputGraphMargin] = useState<Margin>({
                                                                 top: ((0.0292 * OutputGraphHeight) + 28.9),
                                                                 right: ((0.296 * OutputGraphWidth) - 74.6),
                                                                 bottom: ((6.99 * (10**(-3)) * OutputGraphHeight) + 65), 
@@ -52,6 +68,10 @@ const OutputPanel = ( {
             {/* <span id="final-divisional-split">Final split per division:</span> */}
         </section>
     );
+    }
+
+    else {
+        return (<></>)
     }
 };
 
