@@ -1,4 +1,15 @@
-const InputField = (props) => {
+type Props = {
+    type: string,
+    defaultValue: string,
+    className: string,
+    labelText: string,
+    name: string,
+    placeholder: number,
+    value: number,
+    onChange: Function
+}
+
+const InputField = (props: Props) => {
     return (
         <div className={`${props.className} flex justify-between rounded items-center bg-gray-200 block m-3 p-2 w-100`}>
             <label htmlFor={props.name}>{props.labelText}</label>
