@@ -1,6 +1,7 @@
 import InputPanel from './components/InputPanel.js';
 import OutputPanel from './components/OutputPanel.js';
 import { useState } from 'react';
+import type { FC } from 'react';
 import './App.css';
 
 console.log('Hi mom');
@@ -15,28 +16,46 @@ console.log('Hi mom');
 
 // Function for computing the outputs
 
-const App = () => {
+const App: FC = () => {
+
+    type InputData = {
+        piece_distance: number | string,
+        number_of_divisions: number | string,
+        goal_hours: number | string,
+        goal_minutes: number | string,
+        goal_seconds: number | string,
+    }
+
+    type OutputData = {
+        final_time: number,
+        final_time_display: string,
+        final_average_split: number,
+        final_average_split_display: string,
+        number_of_divisions: number,
+        total_distance: number
+    }
     
-    const [dataToCompute, setDataToCompute] = useState({
-        piece_distance: "",
-        number_of_divisions: "",
-        goal_hours: "",
-        goal_minutes: "",
-        goal_seconds: "",
+
+    const [dataToCompute, setDataToCompute] = useState<InputData>({
+        piece_distance: '',
+        number_of_divisions: '',
+        goal_hours: '',
+        goal_minutes: '',
+        goal_seconds: '',
     });
 
-    const [computedData, setComputedData] = useState({
-        final_time: "",
-        final_time_display: "",
-        final_average_split: "",
-        final_average_split_display: "",
-        number_of_divisions: "",
-        total_distance: "",
+    const [computedData, setComputedData] = useState<OutputData>({
+        final_time: 0,
+        final_time_display: '',
+        final_average_split: 0,
+        final_average_split_display: '',
+        number_of_divisions: 0,
+        total_distance: 0,
     });
 
-    const [hasInputsBeenSubmitted, setHasInputsBeenSubmitted] = useState(false);
+    const [hasInputsBeenSubmitted, setHasInputsBeenSubmitted] = useState<boolean>(false);
 
-    const slowestPermissibleSplit = 180; // 3:00 / 500m
+    const slowestPermissibleSplit: number = 180; // 3:00 per 500m
 
     // let [isMouseDown, setIsMouseDown] = useState(false);
     // const handleMouseUp = (event) => {
