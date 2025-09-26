@@ -25,7 +25,7 @@ const InputPanel = ( {
                         slowestPermissibleSplit
                     } : Props ) => {
 
-    const handleChange = (e) => {
+    const handleChange = (e : Event) => {
         // e is the event
         // ...dataToCompute is creating a new object with all the elements of dataToCompute, because React states are immutable
         // We're copying the original state with ...dataToCompute so that when one field's value changes, the rest of the state remains in tact
@@ -36,24 +36,28 @@ const InputPanel = ( {
         );
     };
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: Event) => {
         await event.preventDefault(); // stops page reload
         
         // await setIsFormattedCorrectly(false)
+        const PIECE_DISTANCE = Number(dataToCompute.piece_distance);
+        const GOAL_HOURS = Number(dataToCompute.goal_hours);
+        const GOAL_MINUTES = Number(dataToCompute.goal_minutes);
+        const GOAL_SECONDS = Number(dataToCompute.goal_seconds)
 
         // Compute final time
-        let final_time = (Math.abs(parseFloat(dataToCompute.goal_hours) * 3600)) + (Math.abs(parseFloat(dataToCompute.goal_minutes) * 60)) + (Math.abs(parseFloat(dataToCompute.goal_seconds)));
+        let final_time = (Math.abs(GOAL_HOURS * 3600)) + (Math.abs(GOAL_MINUTES * 60)) + (Math.abs(GOAL_SECONDS));
         isNaN(final_time) ? final_time = 0 : final_time;
         let final_time_display = formatTime(final_time)[1];
 
         let final_average_split = 0;
-        if (dataToCompute.piece_distance > 0) {
-            final_average_split = Math.abs((final_time / dataToCompute.piece_distance) * 500);
+        if (PIECE_DISTANCE > 0) {
+            final_average_split = Math.abs((final_time / PIECE_DISTANCE) * 500);
         }
 
-        let inputSplitTooSlow = final_average_split >= slowestPermissibleSplit;
+        const INPUT_SPLIT_TOO_SLOW = (final_average_split >= slowestPermissibleSplit);
         
-        if (inputSplitTooSlow) {
+        if (INPUT_SPLIT_TOO_SLOW) {
             window.alert("Goal split must be faster than 3:00 / 500m.")
             return;
         }
@@ -78,7 +82,7 @@ const InputPanel = ( {
         )
 
         // Clean input fields
-        let cleaned_dataToCompute = {} 
+        let cleaned_dataToCompute: any = {} 
         for (const key in dataToCompute) {
             cleaned_dataToCompute[key] = trimLeadingZeroes(dataToCompute[key]);
         }
