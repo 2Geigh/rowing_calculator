@@ -1,4 +1,6 @@
-const formatTime = (total_time_in_seconds) => {
+type FormatTimeOutput = [[number, number, number], string];
+
+const formatTime = (total_time_in_seconds: number): FormatTimeOutput => {
     /*
     INPUT MUST BE A NUMBER.
 
@@ -24,15 +26,14 @@ const formatTime = (total_time_in_seconds) => {
 
 
     // Format the display string
-    let time_display;
-    let display_minutes = minutes;
-    let display_seconds = Math.floor(seconds);
+    let display_minutes = JSON.stringify(minutes);
+    let display_seconds = JSON.stringify(Math.floor(seconds));
 
     if (seconds < 10) {
         display_seconds = `0${display_seconds}`;
     }
 
-    time_display = `${display_minutes}:${display_seconds}`;
+    let time_display = `${display_minutes}:${display_seconds}`;
 
     if (hours > 0) {
         if (minutes > 0 && minutes < 10) { // Ex: 1:08:00
