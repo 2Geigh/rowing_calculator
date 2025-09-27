@@ -9,6 +9,7 @@ import formatTime from "../../utils/timeFormat.js";
 
 import type { OutputData } from "../../App.js";
 import type { FC } from "react";
+import type { MouseEvent, MouseEventHandler } from "react";
 import type { RefObject } from "react";
 import type { Margin } from "../OutputPanel.js";
 
@@ -17,15 +18,20 @@ type PROPS = {
     setComputedData: OutputData,
     // OutputGraphRender,
     // setOutputGraphRender,
-    OutputGraphWidth: Number,
-    OutputGraphHeight: Number, 
-    slowestPermissibleSplit: Number, 
+    OutputGraphWidth: number,
+    OutputGraphHeight: number, 
+    slowestPermissibleSplit: number, 
     OutputGraphMargin: Margin,
     // isMouseDown,
     // setIsMouseDown
 }
 
-const OutputGraphForSplitMode: FC = ({
+type PointThatsBeingDraggedByTheUser = {
+    circle_id: number | null,
+    y: number | null
+}
+
+const OutputGraphForSplitMode: FC<PROPS> = ({
                                     computedData,
                                     setComputedData,
                                     // OutputGraphRender,
@@ -41,26 +47,52 @@ const OutputGraphForSplitMode: FC = ({
     console.clear();
 
     const haveThePointsOnTheGraphBeenManipulatedByTheUserYet = useRef<boolean>(false);
-    const point_y_values_REF = useRef({});
+    const point_y_values_REF = useRef<Record<number, number>>({0: 0});
 
-    const MARGIN_PIXELS = OutputGraphMargin;
-    const FIGURE_WIDTH_PIXELS = OutputGraphWidth;
-    const FIGURE_HEIGHT_PIXELS = OutputGraphHeight - MARGIN_PIXELS.top;
-    const NUMBER_OF_DIVISIONS = computedData.number_of_divisions;
+    type FigureParameters = {
+        MARGIN_PIXELS: Margin,
+        WIDTH_PIXELS: number;
+        HEIGHT_PIXELS: number,
+        NUMBER_OF_DIVISIONS: number,
+        SLOWEST_PERMISSIBLE_SPLIT: number;
+        PADDING_PIXELS: {top: number, right: number, bottom: number, left: number},
+        DRAWABLE_REGION_WIDTH_PIXELS: number
+    }
+
+    const FIGURE_PARAMETERS: FigureParameters = {
+        MARGIN_PIXELS: OutputGraphMargin,
+        WIDTH_PIXELS: OutputGraphWidth,
+        HEIGHT_PIXELS: OutputGraphHeight - OutputGraphMargin.top, //OutputGraphHeight - MARGIN_PIXELS.top
+        NUMBER_OF_DIVISIONS: computedData.number_of_divisions,
+        SLOWEST_PERMISSIBLE_SPLIT: slowestPermissibleSplit,
+        PADDING_PIXELS: {top: 0, right: 15, bottom: 0, left: 0},
+        DRAWABLE_REGION_WIDTH_PIXELS: OutputGraphWidth - OutputGraphMargin.left - OutputGraphMargin.right - {top: 0, right: 15, bottom: 0, left: 0}.right // WIDTH_PIXELS - MARGIN_PIXELS.left - MARGIN_PIXELS.right - PADDING_PIXELS.right
+    }
+
     const TOTAL_DISTANCE_METERS = computedData.total_distance;
     const AVERAGE_SPLIT_SI_UNITS = computedData.final_average_split;
-    const SLOWEST_PERMISSIBLE_SPLIT = slowestPermissibleSplit;
-    const FIGURE_PADDING_PIXELS: Margin = {top: 0, right: 15, bottom: 0, left: 0};
-    const FIGURE_DRAWABLE_REGION_WIDTH_PIXELS = FIGURE_WIDTH_PIXELS - MARGIN_PIXELS.left - MARGIN_PIXELS.right - FIGURE_PADDING_PIXELS.right;
+
+
+
+
+    // const MARGIN_PIXELS = OutputGraphMargin;
+    // const FIGURE_WIDTH_PIXELS = OutputGraphWidth;
+    // const FIGURE_HEIGHT_PIXELS = OutputGraphHeight - MARGIN_PIXELS.top;
+    // const NUMBER_OF_DIVISIONS = computedData.number_of_divisions;
+    // const TOTAL_DISTANCE_METERS = computedData.total_distance;
+    // const AVERAGE_SPLIT_SI_UNITS = computedData.final_average_split;
+    // const SLOWEST_PERMISSIBLE_SPLIT = slowestPermissibleSplit;
+    // const FIGURE_PADDING_PIXELS: Margin = {top: 0, right: 15, bottom: 0, left: 0};
+    // const FIGURE_DRAWABLE_REGION_WIDTH_PIXELS = FIGURE_WIDTH_PIXELS - MARGIN_PIXELS.left - MARGIN_PIXELS.right - FIGURE_PADDING_PIXELS.right;
 
     const accessors = {
-        xAccessor: (d) => d.x,
-        yAccessor: (d) => height - d.y,
+        xAccessor: (d: Record<'x', number>) => d.x,
+        yAccessor: (d: Record<'y', number>) => FIGURE_PARAMETERS.HEIGHT_PIXELS - d.y,
     };
 
     const isMouseDown = useRef<boolean>(false);
     const [cursorStyle, setCursorStyle] = useState<string>("row-resize");
-    const pointThatsBeingDraggedByTheUser = useRef<number | null>(null);
+    const pointThatsBeingDraggedByTheUser = useRef<PointThatsBeingDraggedByTheUser>({circle_id: null, y: null});
     const isMouseDraggingPointOnPlot = useRef<boolean>(false);
     const mouseY_relative = useRef<number | null>(null);
     let mouseIsWithinBounds = false;
@@ -72,6 +104,9 @@ const OutputGraphForSplitMode: FC = ({
 
 
     // Compute XY coordinates for each point (one per division)
+
+
+
     const compute_point_coordinates_SI_UNITS = ( 
                                                     number_of_divisions: number,
                                                     total_distance: number,
@@ -169,47 +204,47 @@ const OutputGraphForSplitMode: FC = ({
         return x_axis_domain;
     }
 
-    let point_coordinates_SI_UNITS = compute_point_coordinates_SI_UNITS(NUMBER_OF_DIVISIONS, TOTAL_DISTANCE_METERS, haveThePointsOnTheGraphBeenManipulatedByTheUserYet, point_y_values_REF, AVERAGE_SPLIT_SI_UNITS);
-    let point_x_coordinates_SI_UNITS = compute_point_x_coordinates_SI_UNITS(NUMBER_OF_DIVISIONS, TOTAL_DISTANCE_METERS);
-    let point_y_coordinates_SI_UNITS = compute_point_y_coordinates_SI_UNITS(NUMBER_OF_DIVISIONS, haveThePointsOnTheGraphBeenManipulatedByTheUserYet, point_y_values_REF, AVERAGE_SPLIT_SI_UNITS);
-    let x_axis_domain_SI_UNITS = compute_x_axis_domain_SI_UNITS(NUMBER_OF_DIVISIONS, TOTAL_DISTANCE_METERS);
+    let point_coordinates_SI_UNITS: {[key: number]: [number, number]} = compute_point_coordinates_SI_UNITS(FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS, TOTAL_DISTANCE_METERS, haveThePointsOnTheGraphBeenManipulatedByTheUserYet, point_y_values_REF, AVERAGE_SPLIT_SI_UNITS);
+    let point_x_coordinates_SI_UNITS: number[] = compute_point_x_coordinates_SI_UNITS(FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS, TOTAL_DISTANCE_METERS);
+    let point_y_coordinates_SI_UNITS: number[] = compute_point_y_coordinates_SI_UNITS(FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS, haveThePointsOnTheGraphBeenManipulatedByTheUserYet, point_y_values_REF, AVERAGE_SPLIT_SI_UNITS);
+    let x_axis_domain_SI_UNITS = compute_x_axis_domain_SI_UNITS(FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS, TOTAL_DISTANCE_METERS);
 
 
     const xScale_PIXELS = scaleLinear({
         domain: [0, Math.max(...Object.values(point_x_coordinates_SI_UNITS))], // the categorical labels
-        range: [0, FIGURE_DRAWABLE_REGION_WIDTH_PIXELS],                            // pixel span horizontally
-        padding: 0.0,                         // space between bars
+        range: [0, FIGURE_PARAMETERS.DRAWABLE_REGION_WIDTH_PIXELS],                            // pixel span horizontally
+        // padding: 0.0,                         // space between bars
     }); // xScale("A") returns the left-pixel coordinate for Bar A
 
     const yScale_PIXELS = scaleLinear({
-        domain: [0, SLOWEST_PERMISSIBLE_SPLIT],
-        range: [FIGURE_HEIGHT_PIXELS, 0], // because in an svg, the top is 0
-        padding: 0.0,
+        domain: [0, FIGURE_PARAMETERS.SLOWEST_PERMISSIBLE_SPLIT],
+        range: [FIGURE_PARAMETERS.HEIGHT_PIXELS, 0], // because in an svg, the top is 0
+        // padding: 0.0,
     });
 
     const xAxisScale_PIXELS = scaleLinear({
         domain: [0, Math.max(...x_axis_domain_SI_UNITS)],
-        range: [0, FIGURE_DRAWABLE_REGION_WIDTH_PIXELS],
-        padding: 0.0,
+        range: [0, FIGURE_PARAMETERS.DRAWABLE_REGION_WIDTH_PIXELS],
+        // padding: 0.0,
     });
 
     const yAxisScale_PIXELS = scaleLinear({
-        domain: [SLOWEST_PERMISSIBLE_SPLIT, 0],
-        range: [FIGURE_HEIGHT_PIXELS, 0],
-        padding: 0.0,
+        domain: [FIGURE_PARAMETERS.SLOWEST_PERMISSIBLE_SPLIT, 0],
+        range: [FIGURE_PARAMETERS.HEIGHT_PIXELS, 0],
+        // padding: 0.0,
     });
 
     // Prepare input data for <Bar/>
-    const BAR_WIDTH_PIXELS = FIGURE_DRAWABLE_REGION_WIDTH_PIXELS / NUMBER_OF_DIVISIONS;
+    const BAR_WIDTH_PIXELS = FIGURE_PARAMETERS.DRAWABLE_REGION_WIDTH_PIXELS / FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS;
     const bar_coordinates_PIXELS = []
-    for (let i = 0; i < NUMBER_OF_DIVISIONS; i++) {
-        let barX = i * ((FIGURE_DRAWABLE_REGION_WIDTH_PIXELS) / NUMBER_OF_DIVISIONS);
+    for (let i = 0; i < FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS; i++) {
+        let barX = i * ((FIGURE_PARAMETERS.DRAWABLE_REGION_WIDTH_PIXELS) / FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS);
         let barY: number;
 
         if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
-            barY = yScale_PIXELS(point_y_values_REF.current[i]);
+                barY = yScale_PIXELS(Number(point_y_values_REF.current[i]));
         } else {
-            barY = yScale_PIXELS(point_y_coordinates_SI_UNITS[i]);;
+            barY = yScale_PIXELS(Number(point_y_coordinates_SI_UNITS[i]));
         }
 
         bar_coordinates_PIXELS[i] = {x: barX, y: barY};
@@ -226,14 +261,14 @@ const OutputGraphForSplitMode: FC = ({
     // Prepare input data for <LinearPath/> and <Circle/>
     const pointCoordinates_PIXELS = []
     let to_put_into_BarAndCircleHeights_PIXELS: number[] = []
-    for (let i = 0; i < NUMBER_OF_DIVISIONS; i++) {
-        let pointX = (i * ((FIGURE_DRAWABLE_REGION_WIDTH_PIXELS) / NUMBER_OF_DIVISIONS)) + (BAR_WIDTH_PIXELS/2);
+    for (let i = 0; i < FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS; i++) {
+        let pointX = (i * ((FIGURE_PARAMETERS.DRAWABLE_REGION_WIDTH_PIXELS) / FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS)) + (BAR_WIDTH_PIXELS/2);
         let pointY: number;
 
         if (haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current) {
-            pointY = yAxisScale_PIXELS(point_y_values_REF.current[i]);
+            pointY = yAxisScale_PIXELS(Number(point_y_values_REF.current[i]));
         } else {
-            pointY = yAxisScale_PIXELS(point_y_coordinates_SI_UNITS[i]);
+            pointY = yAxisScale_PIXELS(Number(point_y_coordinates_SI_UNITS[i]));
         }
         
         pointCoordinates_PIXELS[i] = {x: pointX, y: pointY};
@@ -248,26 +283,44 @@ const OutputGraphForSplitMode: FC = ({
 
 
     // EVENT HANDLERS
-    const detectIfCursorIsWithinGraphingBounds = async (event: Event) => {
-        const SVG_HITBOX = document.getElementById("outputGraph").getBoundingClientRect();
+    const detectIfCursorIsWithinGraphingBounds: MouseEventHandler = async (event: MouseEvent<any>) => {
+        const OUTPUT_GRAPH_ELEMENT = document.getElementById("outputGraph") as HTMLElement | null;
+
+        if (!OUTPUT_GRAPH_ELEMENT) {
+            console.error(`No element with id "outputGraph" found.`)
+            return 1;
+        }
+
+        const SVG_HITBOX = OUTPUT_GRAPH_ELEMENT.getBoundingClientRect();
 
         const MOUSE_Y_FROM_VIEWPORT_TOP_PIXELS = event.clientY;
-        mouseY_relative.current = MOUSE_Y_FROM_VIEWPORT_TOP_PIXELS - SVG_HITBOX.top - MARGIN_PIXELS.top;
+        mouseY_relative.current = MOUSE_Y_FROM_VIEWPORT_TOP_PIXELS - SVG_HITBOX.top - FIGURE_PARAMETERS.MARGIN_PIXELS.top;
 
-        const svg_height = FIGURE_HEIGHT_PIXELS;
-        mousePercentage = mouseY_relative.current / svg_height * 100;
+        const SVG_HEIGHT_PIXELS = FIGURE_PARAMETERS.HEIGHT_PIXELS;
+        mousePercentage = mouseY_relative.current / SVG_HEIGHT_PIXELS * 100;
 
-        let mouseIsWithinVerticalBounds = (mouseY_relative.current >= 0) && (MOUSE_Y_FROM_VIEWPORT_TOP_PIXELS <= (SVG_HITBOX.bottom - MARGIN_PIXELS.bottom));
+        let mouseIsWithinVerticalBounds = (mouseY_relative.current >= 0) && (MOUSE_Y_FROM_VIEWPORT_TOP_PIXELS <= (SVG_HITBOX.bottom - FIGURE_PARAMETERS.MARGIN_PIXELS.bottom));
         mouseIsWithinBounds = mouseIsWithinVerticalBounds // This is here for if you want to implement horizontal bounds in the future
 
         if (mouseIsWithinBounds && isMouseDraggingPointOnPlot.current) {
             // while (isMouseDraggingPointOnPlot) {
-                setBarAndCircleHeights_PIXELS({...BarAndCircleHeights_PIXELS, [pointThatsBeingDraggedByTheUser.current]: mouseY_relative.current});
+                setBarAndCircleHeights_PIXELS({...BarAndCircleHeights_PIXELS, [Number(pointThatsBeingDraggedByTheUser.current)]: mouseY_relative.current});
 
-                if (pointThatsBeingDraggedByTheUser.y > SLOWEST_PERMISSIBLE_SPLIT) {
-                    point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = SLOWEST_PERMISSIBLE_SPLIT;
+                // -Infinity so that if the first goes else, the second will also go else
+                // Because no number can be smaller than -Infinity
+                let pointThatsBeingDraggedByTheUser_y_value = -Infinity;
+
+                if (!pointThatsBeingDraggedByTheUser.current.circle_id || !pointThatsBeingDraggedByTheUser.current.y) {
+                    console.error(`No point is recognized as having been touched by the user.`);
+                    return 1;
                 } else {
-                    point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current] = pointThatsBeingDraggedByTheUser.y;
+                    pointThatsBeingDraggedByTheUser_y_value = pointThatsBeingDraggedByTheUser.current.y;
+                }
+
+                if ((pointThatsBeingDraggedByTheUser.current.y > FIGURE_PARAMETERS.SLOWEST_PERMISSIBLE_SPLIT)) {
+                    point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current.circle_id] = FIGURE_PARAMETERS.SLOWEST_PERMISSIBLE_SPLIT;
+                } else {
+                    point_y_values_REF.current[pointThatsBeingDraggedByTheUser.current.circle_id] = pointThatsBeingDraggedByTheUser_y_value;
                 }
 
                 haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current = true;
@@ -282,7 +335,7 @@ const OutputGraphForSplitMode: FC = ({
                 //     total_distance: "",
                 // });
                 
-                let plotted_circles = document.getElementsByClassName("plotted_circle");
+                let plotted_circles = document.getElementsByClassName("plotted_circle") as HTMLCollectionOf<SVGCircleElement>;
                 let plotted_circles_y_values: number[] = [];
                 let circle_height_proportions: number[] = [];
                 let plotted_circles_splits: number[] = [];
@@ -291,16 +344,23 @@ const OutputGraphForSplitMode: FC = ({
 
                 // Get the height values of every circle in the plot
                 for (let i=0; i<plotted_circles.length; i++) {
-                    plotted_circles_y_values.push(plotted_circles[i].cy.animVal.value);
+                    const circle = plotted_circles[i] as SVGCircleElement;
+                    if (circle) {
+                        plotted_circles_y_values.push(Number(circle.cy.animVal.value));
+                    }
                 }
 
                 // Convert all the height values into splits
                 for (let i=0; i<plotted_circles_y_values.length; i++) {
-                    circle_height_proportions.push(plotted_circles_y_values[i] / svg_height);
+                    const circle_y_value = plotted_circles[i];
+                    if (circle_y_value) {
+                        circle_height_proportions.push(Number(circle_y_value) / SVG_HEIGHT_PIXELS);
+                    }
                 }
 
                 for (let i=0; i<circle_height_proportions.length; i++) {
-                    plotted_circles_splits.push(circle_height_proportions[i] * SLOWEST_PERMISSIBLE_SPLIT);
+                    const circle_height_proportion = circle_height_proportions[i];
+                    plotted_circles_splits.push(Number(circle_height_proportion) * FIGURE_PARAMETERS.SLOWEST_PERMISSIBLE_SPLIT);
                 }
                 console.log(plotted_circles_splits);
 
@@ -315,9 +375,9 @@ const OutputGraphForSplitMode: FC = ({
                 //Update data state
                 computedData_REF.current = {...computedData,
                     final_time: new_final_time,
-                    final_time_display: formatTime(new_final_time)[1],
+                    final_time_display: JSON.stringify(formatTime(new_final_time)[1]),
                     final_average_split: new_final_average_split,
-                    final_average_split_display: formatTime(new_final_average_split)[1],
+                    final_average_split_display: JSON.stringify(formatTime(new_final_average_split)[1]),
                 };
             // }
         }
@@ -328,12 +388,12 @@ const OutputGraphForSplitMode: FC = ({
         }
     };
 
-    const handleMouseleave_CONTAINER = (event: Event) => {
+    const handleMouseleave_CONTAINER: MouseEventHandler = (event: MouseEvent<any>) => {
         isMouseDraggingPointOnPlot.current = false;
         handleMouseUp_CIRCLE(event);
     };
 
-    const handleMouseUp_CONTAINER = (event: Event) => {
+    const handleMouseUp_CONTAINER: MouseEventHandler<HTMLElement> = (event: MouseEvent<HTMLElement>) => {
 
         if (isMouseDraggingPointOnPlot) {
             haveThePointsOnTheGraphBeenManipulatedByTheUserYet.current = true;
@@ -344,16 +404,18 @@ const OutputGraphForSplitMode: FC = ({
         
     };
 
-    const handleMouseMove_CIRCLE = (event: Event) => {
-        pointThatsBeingDraggedByTheUser.current = event.target.id.slice(-1);
-        pointThatsBeingDraggedByTheUser.y = BarAndCircleHeights_PIXELS[pointThatsBeingDraggedByTheUser.current];
+    const handleMouseMove_CIRCLE: MouseEventHandler<SVGCircleElement> = (event: MouseEvent) => {
+        if (event.target instanceof HTMLElement && event.target.id) {
+            pointThatsBeingDraggedByTheUser.current.circle_id = Number(event.target.id.slice(-1));
+            pointThatsBeingDraggedByTheUser.current.y = Number(BarAndCircleHeights_PIXELS[pointThatsBeingDraggedByTheUser.current.circle_id]);
+        }
     };
 
-    const handleMouseEnter_CIRCLE = (event: Event) => {
+    const handleMouseEnter_CIRCLE: MouseEventHandler<SVGCircleElement> = (event: MouseEvent) => {
         // console.log(pointThatsBeingDraggedByTheUser)
     };
 
-    const handleMouseUp_CIRCLE = (event: Event) => {
+    const handleMouseUp_CIRCLE: MouseEventHandler<SVGCircleElement> = (event: MouseEvent) => {
         isMouseDown.current = false;
         setCursorStyle("row-resize");
         isMouseDraggingPointOnPlot.current = false;
@@ -361,13 +423,13 @@ const OutputGraphForSplitMode: FC = ({
 
     };
 
-    const handleMouseDown_CIRCLE = (event: Event) => {
+    const handleMouseDown_CIRCLE: MouseEventHandler<SVGCircleElement> = (event: MouseEvent) => {
         isMouseDown.current = true;
         setCursorStyle("grab");
         isMouseDraggingPointOnPlot.current = true;
     };
 
-    const handleMouseLeave_CIRCLE = (event: Event) => {
+    const handleMouseLeave_CIRCLE: MouseEventHandler<SVGCircleElement> = (event: MouseEvent) => {
         // isMouseDraggingPointOnPlot.current = false;
     };
 
@@ -381,14 +443,14 @@ const OutputGraphForSplitMode: FC = ({
 
             <div id="graphAndXAxisLabel" className="block center bg-pink-300" onMouseMove={detectIfCursorIsWithinGraphingBounds} onMouseUp={handleMouseUp_CONTAINER} onMouseLeave={handleMouseleave_CONTAINER}>
                 <svg
-                    width={FIGURE_WIDTH_PIXELS - MARGIN_PIXELS.right}
-                    height={FIGURE_HEIGHT_PIXELS + MARGIN_PIXELS.bottom}
+                    width={FIGURE_PARAMETERS.WIDTH_PIXELS - FIGURE_PARAMETERS.MARGIN_PIXELS.right}
+                    height={FIGURE_PARAMETERS.HEIGHT_PIXELS + FIGURE_PARAMETERS.MARGIN_PIXELS.bottom}
                     className="bg-red-100"
                     // onMouseMoveCapture={detectIfCursorIsWithinGraphingBounds}
                     >
                         <Group
-                            left={MARGIN_PIXELS.left}
-                            top={MARGIN_PIXELS.top}> {/* Offset entire group to make room for label */}
+                            left={FIGURE_PARAMETERS.MARGIN_PIXELS.left}
+                            top={FIGURE_PARAMETERS.MARGIN_PIXELS.top}> {/* Offset entire group to make room for label */}
                                 
                                 {/* Y-Axis with Units */}
                                 <Axis
@@ -411,7 +473,7 @@ const OutputGraphForSplitMode: FC = ({
                                 {/* X-Axis with Units */}
                                 <Axis
                                 scale={xAxisScale_PIXELS}
-                                top={FIGURE_HEIGHT_PIXELS}
+                                top={FIGURE_PARAMETERS.HEIGHT_PIXELS}
                                 left={0}
                                 // stroke="black"
                                 // tickStroke="black"
@@ -423,12 +485,12 @@ const OutputGraphForSplitMode: FC = ({
                                 label="Distance (m)"
                                 labelOffset={15}
                                 labelClassName="text-base"
-                                numTicks={NUMBER_OF_DIVISIONS}
+                                numTicks={FIGURE_PARAMETERS.NUMBER_OF_DIVISIONS}
                                 />
 
                                 {/* BARS */}
                                 {bar_coordinates_PIXELS.map((p,i) => {
-                                const barHeight = /*p.y*/FIGURE_HEIGHT_PIXELS - BarAndCircleHeights_PIXELS[i];
+                                const barHeight = /*p.y*/FIGURE_PARAMETERS.HEIGHT_PIXELS - Number(BarAndCircleHeights_PIXELS[i]);
                                 const barX = p.x;
                                 const barY = BarAndCircleHeights_PIXELS[i];
 
