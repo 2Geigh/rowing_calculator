@@ -1,3 +1,5 @@
+import type { ChangeEventHandler } from "react";
+
 type Props = {
     type: string,
     defaultValue: string,
@@ -6,7 +8,7 @@ type Props = {
     name: string,
     placeholder: number,
     value: number,
-    onChange: Function
+    onChange: ChangeEventHandler
 }
 
 const InputField = (props: Props) => {
@@ -20,7 +22,7 @@ const InputField = (props: Props) => {
 
                 name={props.name}
                 type={props.type}
-                placeholder={props.placeholder}
+                placeholder={JSON.stringify(props.placeholder)}
                 value={props.value}
                 onChange={props.onChange}
                 id={props.name}
