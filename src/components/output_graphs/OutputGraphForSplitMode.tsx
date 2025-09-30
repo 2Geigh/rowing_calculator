@@ -8,14 +8,15 @@ import arrayMean from "ml-array-mean";
 import formatTime from "../../utils/timeFormat.js";
 
 import type { OutputData } from "../../App.js";
-import type { FC } from "react";
+import type { InputData } from "../../App.js";
+import type { Dispatch, FC, SetStateAction } from "react";
 import type { MouseEvent, MouseEventHandler } from "react";
 import type { RefObject } from "react";
 import type { Margin } from "../OutputPanel.js";
 
 type PROPS = {
     computedData: OutputData,
-    setComputedData: OutputData,
+    setComputedData: Dispatch<SetStateAction<InputData | OutputData>>,
     // OutputGraphRender,
     // setOutputGraphRender,
     OutputGraphWidth: number,

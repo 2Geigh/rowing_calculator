@@ -3,15 +3,16 @@ import formatTime from '../utils/timeFormat.js'
 import trimLeadingZeroes from '../utils/validation.js';
 
 import type { InputData, OutputData } from '../App.js';
+import type { Dispatch, SetStateAction } from 'react';
 
 type Props = {
     dataToCompute: InputData,
-    setDataToCompute: InputData,
+    setDataToCompute: Dispatch<SetStateAction<InputData>>,
 
     computedData: OutputData,
-    setComputedData: OutputData,
+    setComputedData: Dispatch<SetStateAction<OutputData>>,
 
-    setHasInputsBeenSubmitted: boolean,
+    setHasInputsBeenSubmitted: Dispatch<SetStateAction<boolean>>,
 
     slowestPermissibleSplit: number
 };

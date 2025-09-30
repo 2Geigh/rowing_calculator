@@ -1,13 +1,14 @@
 import OutputGraphForSplitMode from "./output_graphs/OutputGraphForSplitMode.js";
-import { useState, type FC } from "react";
+import { useState, type Dispatch, type FC, type SetStateAction, } from "react";
 
-import type { OutputData } from "../App.js";
+import type { InputData, OutputData } from "../App.js";
 
 type Props = {
     computedData: OutputData,
-    setComputedData: Function,
+    setComputedData: Dispatch<SetStateAction<OutputData>>,
     hasInputsBeenSubmitted: boolean,
     slowestPermissibleSplit: number
+    // outputGraphRender: number,
 }
 
 export type Margin = {
@@ -17,14 +18,15 @@ export type Margin = {
     left: number
 }
 
-const OutputPanel: FC = ( {
+const OutputPanel: FC<Props> = ( {
                         computedData,
                         setComputedData,
-                        hasInputsBeenSubmitted, 
+                        hasInputsBeenSubmitted,
                         slowestPermissibleSplit,
+                        // outputGraphRender,
                         // isMouseDown,
                         // setIsMouseDown
-                    } : Props) => {
+                    }) => {
 
     const [OutputGraphRender, setOutputGraphRender] = useState<number>(0);
 
@@ -74,5 +76,6 @@ const OutputPanel: FC = ( {
         return (<></>)
     }
 };
+
 
 export default OutputPanel;
