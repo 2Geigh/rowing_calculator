@@ -2,13 +2,13 @@ import type { ChangeEventHandler } from "react";
 
 type Props = {
     type: string,
-    defaultValue: string,
     className: string,
     labelText: string,
     name: string,
     placeholder: number,
     value: number,
-    onChange: ChangeEventHandler
+    onChange: ChangeEventHandler,
+    defaultValue?: string,
 }
 
 const InputField = (props: Props) => {

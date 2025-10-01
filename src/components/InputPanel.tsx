@@ -3,7 +3,7 @@ import formatTime from '../utils/timeFormat.js'
 import trimLeadingZeroes from '../utils/validation.js';
 
 import type { InputData, OutputData } from '../App.js';
-import type { Dispatch, SetStateAction } from 'react';
+import type { ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 type Props = {
     dataToCompute: InputData,
@@ -26,10 +26,17 @@ const InputPanel = ( {
                         slowestPermissibleSplit
                     } : Props ) => {
 
-    const handleChange = (e : Event) => {
+    const handleChange = (e : ChangeEvent) => {
         // e is the event
         // ...dataToCompute is creating a new object with all the elements of dataToCompute, because React states are immutable
         // We're copying the original state with ...dataToCompute so that when one field's value changes, the rest of the state remains in tact
+        let target_name: string;
+        let target_value: number;
+
+        if (e.target != null) {
+            target_name = e.target.className;
+            target_value = e.target.value;
+        }
         setDataToCompute(
             // e.target is the element that fired the event (the <input>)
             // [] tells JS to use the value inside it as the name of the key that we're overwriting (in this case, use e.target.name as the name of the key)
@@ -104,7 +111,7 @@ const InputPanel = ( {
 
             <InputField
                 labelText="Distance of piece (m): "
-                className="piece-distance-input"
+                className="piece_distance_input"
                 name="piece_distance"
                 type="number"
                 placeholder={2000}
@@ -114,7 +121,7 @@ const InputPanel = ( {
 
             <InputField
                 labelText="Number of divisions of piece: "
-                className="number-of-divisions-input"
+                className="number_of_divisions"
                 name="number_of_divisions"
                 type="number"
                 placeholder={4}
@@ -124,7 +131,7 @@ const InputPanel = ( {
 
             <InputField
                 labelText="Goal hours: "
-                className="goal-hours"
+                className="goal_hours"
                 name="goal_hours"
                 type="number"
                 placeholder={0}
@@ -134,7 +141,7 @@ const InputPanel = ( {
 
             <InputField
                 labelText="Goal minutes: "
-                className="goal-minutes"
+                className="goal_minutes"
                 name="goal_minutes"
                 type="number"
                 placeholder={6}
@@ -144,7 +151,7 @@ const InputPanel = ( {
 
             <InputField
                 labelText="Goal seconds: "
-                className="goal-seconds"
+                className="goal_seconds"
                 name="goal_seconds"
                 type="number"
                 placeholder={34}

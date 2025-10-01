@@ -16,7 +16,7 @@ import type { Margin } from "../OutputPanel.js";
 
 type PROPS = {
     computedData: OutputData,
-    setComputedData: Dispatch<SetStateAction<InputData | OutputData>>,
+    setComputedData: Dispatch<SetStateAction<OutputData>>,
     // OutputGraphRender,
     // setOutputGraphRender,
     OutputGraphWidth: number,

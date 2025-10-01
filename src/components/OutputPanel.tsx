@@ -53,8 +53,8 @@ const OutputPanel: FC<Props> = ( {
             <span id="final-time">Goal final time: {computedData.final_time_display}</span>
             <span id="final-average-split">Goal average split: {computedData.final_average_split_display}</span>
             <OutputGraphForSplitMode
-                OutputGraphRender={OutputGraphRender}
-                setOutputGraphRender={setOutputGraphRender}
+                // OutputGraphRender={OutputGraphRender}
+                // setOutputGraphRender={setOutputGraphRender}
                 computedData={computedData}
                 setComputedData={setComputedData}
                 OutputGraphWidth={OutputGraphWidth}
